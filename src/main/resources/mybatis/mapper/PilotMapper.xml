@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="aircrew.version1.mapper.PilotMapper">
+
+    <select id="getById" resultType="aircrew.version1.entity.Pilot">
+        SELECT * FROM pilot WHERE id=#{id}
+    </select>
+
+    <select id="list" resultType="aircrew.version1.entity.Pilot">
+        SELECT * FROM pilot
+    </select>
+
+    <insert id="insert">
+        INSERT INTO pilot(id,name,eid,line,tcc,properties,date,error) VALUES (#{id},#{name},#{eid},#{line},#{tcc},#{properties},#{date},#{error})
+    </insert>
+
+    <insert id="insertByExcel">
+        INSERT INTO pilot(id,name,eid,line,tcc,properties,date,error) VALUES (#{id},#{excel.name},#{excel.eid},#{excel.line},#{excel.tcc},#{excel.properties},#{excel.date},0)
+    </insert>
+
+    <insert id="listInsertExcel" parameterType="java.util.List">
+        INSERT INTO pilot(id,name,eid,line,tcc,properties,date,error) VALUES <foreach collection="list" item="item" index= "index" separator =",">
+        (null,
+        #{item.name},
+        #{item.eid},
+        #{item.line},
+        #{item.tcc},
+        #{item.properties},
+        #{item.date},
+        0
+        )
+    </foreach>
+    </insert>
+
+    <delete id="deleteById">
+        DELETE  FROM pilot WHERE id=#{id}
+    </delete>
+
+    <update id="updateById" >
+        UPDATE pilot SET name=#{name},eid=#{eid},line=#{line},tcc=#{tcc},properties=#{properties},date=#{date},error=#{error} WHERE id=#{id}
+    </update>
+
+    <delete id="delete">
+        truncate table pilot
+    </delete>
+
+    <select id="getLastId" resultType="Integer">
+        select id from pilot order by id DESC limit 1;
+    </select>
+
+    <select id="ByOrder" resultType="aircrew.version1.entity.Pilot">
+        select * from pilot ORDER BY eid ,date;
+    </select>
+
+</mapper>
