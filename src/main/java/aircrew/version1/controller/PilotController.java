@@ -28,13 +28,20 @@ public class PilotController {
     @Autowired
     PilotRepository pilotRepository;
 
+    @GetMapping("/pilot/findAll")
+    public List<Pilot> findAll(){
+        return pilotRepository.findAll();
+    }
+
+
+
     /**
      * 跳转至pilot主页面
      */
     @GetMapping("/pilot")
     public String pilot(Model model,
                        @RequestParam(defaultValue = "1",value = "pageNum") Integer pageNum){
-        PageHelper.startPage(pageNum,20);
+        PageHelper.startPage(pageNum,10);
         List<Pilot> pilotList = pilotMapper.list();
         PageInfo<Pilot> pilotPageInfo = new PageInfo<Pilot>(pilotList);
         model.addAttribute("pilotPageInfo",pilotPageInfo);

@@ -1,5 +1,6 @@
 package aircrew.version1.entity;
 
+import lombok.Data;
 import javax.persistence.*;
 
 
@@ -10,6 +11,7 @@ import javax.persistence.*;
  *
  */
 @Entity
+@Data
 public class Pilot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,71 +52,6 @@ public class Pilot {
     public Pilot(){
 
     }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getEid() {
-        return eid;
-    }
-
-    public void setEid(int eid) {
-        this.eid = eid;
-    }
-
-    public String getLine() {
-        return line;
-    }
-
-    public void setLine(String line) {
-        this.line = line;
-    }
-
-    public String getTcc() {
-        return tcc;
-    }
-
-    public void setTcc(String tcc) {
-        this.tcc = tcc;
-    }
-
-    public String getProperties() {
-        return properties;
-    }
-
-    public void setProperties(String properties) {
-        this.properties = properties;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public int getError() {
-        return error;
-    }
-
-    public void setError(int error) {
-        this.error = error;
-    }
-
     @Override
     public String toString(){
         return "Pilot{" +

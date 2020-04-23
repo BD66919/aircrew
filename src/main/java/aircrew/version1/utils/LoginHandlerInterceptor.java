@@ -16,17 +16,18 @@ import java.io.IOException;
  */
 @Controller
 public class LoginHandlerInterceptor implements HandlerInterceptor {
-    @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,Object handler) throws ServletException, IOException {
-        Object user = request.getSession().getAttribute("userName");
-        if(user == null){
-            request.setAttribute("message","没有权限请先登陆");
-            request.getRequestDispatcher("/login.html").forward(request,response);
-            return false;
-        }else{
-            return true;
-        }
-    }
+
+//    @Override
+//    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,Object handler) throws ServletException, IOException {
+//        Object user = request.getSession().getAttribute("userName");
+//        if(user == null){
+//            request.setAttribute("message","没有权限请先登陆");
+//            request.getRequestDispatcher("/login.html").forward(request,response);
+//            return false;
+//        }else{
+//            return true;
+//        }
+//    }
 
     @ExceptionHandler(value = FileUploadBase.FileSizeLimitExceededException.class)
     public boolean fileUploadExceptionHandler(FileUploadBase.FileSizeLimitExceededException excption, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

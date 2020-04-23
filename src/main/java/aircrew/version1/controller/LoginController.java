@@ -54,7 +54,7 @@ public class LoginController {
             return "login.html";
         }else if (userName.equals(loginName) && userPwd.equals(loginPwd)){
             session.setAttribute("userName",userName);
-            main(model);
+
             return "main.html";
         }else{
             map.put("message","用户名或者密码错误");

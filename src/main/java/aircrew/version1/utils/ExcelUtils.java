@@ -57,6 +57,8 @@ public class ExcelUtils {
                         if (j == 0) {
                             PilotExcel.setName(data);
                         }else if (j == 1) {
+                            if(data.equals(""))
+                                data = "00000";
                             PilotExcel.setEid(Integer.parseInt(data));
                         }else if (j == 2) {
                             PilotExcel.setLine(data);

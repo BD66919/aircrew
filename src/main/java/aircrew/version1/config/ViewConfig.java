@@ -31,10 +31,11 @@ public class ViewConfig extends WebMvcConfigurationSupport {
         registry.addResourceHandler("/templates/**").addResourceLocations("classpath:/templates/");
     }
 
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry){
-//        registry.addInterceptor(new LoginHandlerInterceptor()).addPathPatterns("/**")
-//                .excludePathPatterns("/login.html","/","/userLogin")
-//                .excludePathPatterns("/static/**");
-//    }
+    @Override
+    public void addInterceptors(InterceptorRegistry registry){
+        registry.addInterceptor(new LoginHandlerInterceptor()).addPathPatterns("/**")
+                .excludePathPatterns("/login.html","/","/userLogin")
+                .excludePathPatterns("/static/**");
+    }
+
 }

@@ -1,6 +1,5 @@
 package aircrew.version1.controller;
 
-
 import aircrew.version1.entity.Excel;
 import aircrew.version1.entity.Pilot;
 import aircrew.version1.mapper.PilotMapper;
@@ -9,15 +8,12 @@ import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,58 +32,64 @@ public class ExcelController {
     @Autowired
     PilotMapper pilotMapper;
 
-    //覆盖性上传EXCEL数据
-    @PostMapping("/coverUploadExcel")
-    public String coverUploadExcel(@RequestParam("file") MultipartFile file,
-                              Map<String, Object> map) throws IOException, InvalidFormatException {
+    @PostMapping(value = "/coverUploadExcel")
+    @ResponseBody
+    public Map<String,Object> coverUploadExcel(@RequestParam("file") MultipartFile file
+                                                   ) throws IOException, InvalidFormatException {
+        Map<String,Object> map = new HashMap<String,Object>();
         String fileName = file.getOriginalFilename();
+        assert fileName != null;
         if (fileName.length() < 5 ) {
-            map.put("message","文件格式错误");
-            return "/pilot/coverupload.html";
+            map.put("msg","文件格式错误");
+            return map;
         } else if(!(fileName.substring(fileName.length() - 5).equals(".xlsx")) & !(fileName.substring(fileName.length() - 4).equals(".xls"))){
-            map.put("message","文件类型错误");
-            return "/pilot/coverupload.html";
+            map.put("msg","文件类型错误");
+            return map;
         }
         List<Excel> excelList = null;
         try {
             excelList = ExcelUtils.excelToShopIdList(file.getInputStream());
-            if (excelList == null || excelList.size() <= 0) {
-                map.put("message","导入的数据为空或者不符合要求");
-                return "/pilot/coverupload.html";
+            if (excelList.size() <= 0) {
+                map.put("msg","导入的数据为空或者不符合要求");
+                return map;
             }
             //excel的数据保存到数据库
             try {
                 pilotMapper.delete();
                 pilotMapper.listInsertExcel(null, excelList,0);
             } catch (Exception e) {
-                map.put("message","导入的数据格式有误或者与当前已存在的数据中存在重复");
-                return "/pilot/coverupload.html";
+                map.put("msg","导入的数据格式有误或者与当前已存在的数据中存在重复");
+                return map;
             }
         } catch (Exception e) {
-            map.put("message","导入异常");
-            return "/pilot/coverupload.html";
+            map.put("msg","导入异常");
+            return map;
         }
-        return "redirect:/pilot";
+        map.put("msg","导入成功");
+        return map;
     }
 
     //追加性上传EXCEL数据
-    @PostMapping("/addUploadExcel")
-    public String addUploadExcel(@RequestParam("file") MultipartFile file,
-                              Map<String, Object> map) throws IOException, InvalidFormatException {
+    @PostMapping(value = "/addUploadExcel")
+    @ResponseBody
+    public Map<String,Object> addUploadExcel(@RequestParam("file") MultipartFile file
+                              ) throws IOException, InvalidFormatException {
+        Map<String,Object> map = new HashMap<String,Object>();
         String fileName = file.getOriginalFilename();
+        assert fileName != null;
         if (fileName.length() < 5 ) {
-            map.put("message","文件格式错误");
-            return "/pilot/addupload.html";
+            map.put("msg","文件格式错误");
+            return map;
         } else if(!(fileName.substring(fileName.length() - 5).equals(".xlsx")) & !(fileName.substring(fileName.length() - 4).equals(".xls"))){
-            map.put("message","文件类型错误");
-            return "/pilot/addupload.html";
+            map.put("msg","文件类型错误");
+            return map;
         }
         List<Excel> excelList = null;
         try {
             excelList = ExcelUtils.excelToShopIdList(file.getInputStream());
-            if (excelList == null || excelList.size() <= 0) {
-                map.put("message","导入的数据为空或者不符合要求");
-                return "/pilot/addupload.html";
+            if (excelList.size() <= 0) {
+                map.put("msg","导入的数据为空或者不符合要求");
+                return map;
             }
             //excel的数据保存到数据库
             try {
@@ -97,14 +99,15 @@ public class ExcelController {
                     pilotMapper.insertByExcel(lastId,pilot,0);
                 }
             } catch (Exception e) {
-                map.put("message","导入的数据格式有误或者与当前已存在的数据中存在重复");
-                return "/pilot/addupload.html";
+                map.put("msg","导入的数据格式有误或者与当前已存在的数据中存在重复");
+                return map;
             }
         } catch (Exception e) {
-            map.put("message","导入异常");
-            return "/pilot/addupload.html";
+            map.put("msg","导入异常");
+            return map;
         }
-        return "redirect:/pilot";
+        map.put("msg","导入成功");
+        return map;
     }
 
     //下载所有数据保存到excel中

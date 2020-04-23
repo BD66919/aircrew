@@ -14,7 +14,7 @@ public class Excel {
     private String properties;
     private String date;
     private String path; //Excel写入的路径名
-    private String sheetName; //工资表名称（Excel的左下角）
+    private String sheetName; //表名称（Excel的左下角）
     private int row; //行数
     private int col; //列数
     private List<String> titleList; //列表头标题
