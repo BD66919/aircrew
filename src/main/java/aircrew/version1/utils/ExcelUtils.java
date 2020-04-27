@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class ExcelUtils {
 
-    public static List<Excel> excelToShopIdList(InputStream inputStream) {
+    public static List<Excel> excelToFinanceList(InputStream inputStream) {
         List<Excel> Excellist = new ArrayList<>();
         Workbook workbook = null;
         Date datetime = null;

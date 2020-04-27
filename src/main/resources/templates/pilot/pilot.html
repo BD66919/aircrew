@@ -42,19 +42,30 @@
                         <td th:text="${pilot.tcc}">1</td>
                         <td th:text="${pilot.properties}">1</td>
                         <td th:text="${pilot.date}">1</td>
-                        <td>
-                        </td>
+                        <td></td>
                     </tr>
                     </tbody>
                 </table>
                 <div style="text-align:left">
                     <a  href="/aircrew/pilot/add.html"  class="btn btn-success"  >添加数据</a>
                     <a  href="/aircrew/pilot/query.html" class="btn btn-success"  >查询数据</a>
-                    <button class="btn btn-success" data-toggle="modal" data-target="#coverUp">上传覆盖数据</button>
-                    <button class="btn btn-success" data-toggle="modal" data-target="#addUp">上传追加数据</button>
+                        <div class="btn-group" style=" position:relative;   z-index:99999; " >
+                            <button type="button" class="btn btn-success ">上传数据</button>
+                            <button type="button" class="btn btn-success dropdown-toggle " data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="caret"></span>
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1">
+                                <button class="btn-lg btn-success" data-toggle="modal" data-target="#coverUp" style="display:block;margin:0 auto">上传覆盖数据</button>
+                                <button class="btn-lg btn-success" data-toggle="modal" data-target="#addUp" style="display:block;margin:0 auto">上传追加数据</button>
+                            </ul>
+                        </div>
                     <a  href="/aircrew/excelDownloads"  class="btn btn-success"  >下载所有数据</a>
                     <a  href="/aircrew/pilot/pilotcheck/check.html"  class="btn btn-success"  >飞行员飞行及调度路线校验</a>
                 </div>
+                <br>
+                <br>
+                <br>
                 <div style="text-align: center">
                     <p>当前 <span th:text="${pilotPageInfo.pageNum}"></span> 页,总 <span th:text="${pilotPageInfo.pages}"></span> 页,共 <span th:text="${pilotPageInfo.total}"></span> 条记录</p>
                 </div>
@@ -161,4 +172,5 @@
         })
     });
 </script>
+
 </html>

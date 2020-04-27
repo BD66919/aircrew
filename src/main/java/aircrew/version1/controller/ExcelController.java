@@ -2,8 +2,11 @@ package aircrew.version1.controller;
 
 import aircrew.version1.entity.Excel;
 import aircrew.version1.entity.Pilot;
+import aircrew.version1.entity.Soc;
 import aircrew.version1.mapper.PilotMapper;
+import aircrew.version1.mapper.SocRepository;
 import aircrew.version1.utils.ExcelUtils;
+import aircrew.version1.utils.SocExcelUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +35,52 @@ public class ExcelController {
     @Autowired
     PilotMapper pilotMapper;
 
+    @Autowired
+    SocRepository socRepository;
+
+    @PostMapping(value = "/coverUploadExcel2")
+    @ResponseBody
+    public Map<String,Object> coverUploadExcel2(@RequestParam("file") MultipartFile file
+                                                   ) throws IOException, InvalidFormatException {
+        Map<String,Object> map = new HashMap<String,Object>();
+        String fileName = file.getOriginalFilename();
+        assert fileName != null;
+        if (fileName.length() < 5 ) {
+            map.put("msg","文件格式错误");
+            return map;
+        } else if(!(fileName.substring(fileName.length() - 5).equals(".xlsx")) & !(fileName.substring(fileName.length() - 4).equals(".xls"))){
+            map.put("msg","文件类型错误");
+            return map;
+        }
+        List<Soc> excelList = null;
+        try {
+            excelList = SocExcelUtils.excelToSocList(file.getInputStream());
+            if (excelList.size() <= 0) {
+                map.put("msg","导入的数据为空或者不符合要求");
+                return map;
+            }
+            //excel的数据保存到数据库
+            try {
+                socRepository.saveAll(excelList);
+                //pilotMapper.delete();
+                //pilotMapper.listInsertExcel(null, excelList,0);
+            } catch (Exception e) {
+                map.put("msg","导入的数据格式有误或者与当前已存在的数据中存在重复");
+                return map;
+            }
+        } catch (Exception e) {
+            map.put("msg","导入异常");
+            return map;
+        }
+        map.put("msg","导入成功");
+        return map;
+    }
+
+
     @PostMapping(value = "/coverUploadExcel")
     @ResponseBody
     public Map<String,Object> coverUploadExcel(@RequestParam("file") MultipartFile file
-                                                   ) throws IOException, InvalidFormatException {
+    ) throws IOException, InvalidFormatException {
         Map<String,Object> map = new HashMap<String,Object>();
         String fileName = file.getOriginalFilename();
         assert fileName != null;
@@ -48,13 +93,14 @@ public class ExcelController {
         }
         List<Excel> excelList = null;
         try {
-            excelList = ExcelUtils.excelToShopIdList(file.getInputStream());
+            excelList = ExcelUtils.excelToFinanceList(file.getInputStream());
             if (excelList.size() <= 0) {
                 map.put("msg","导入的数据为空或者不符合要求");
                 return map;
             }
             //excel的数据保存到数据库
             try {
+               // socRepository.saveAll(excelList);
                 pilotMapper.delete();
                 pilotMapper.listInsertExcel(null, excelList,0);
             } catch (Exception e) {
@@ -86,7 +132,7 @@ public class ExcelController {
         }
         List<Excel> excelList = null;
         try {
-            excelList = ExcelUtils.excelToShopIdList(file.getInputStream());
+            excelList = ExcelUtils.excelToFinanceList(file.getInputStream());
             if (excelList.size() <= 0) {
                 map.put("msg","导入的数据为空或者不符合要求");
                 return map;
@@ -94,10 +140,12 @@ public class ExcelController {
             //excel的数据保存到数据库
             try {
                 Integer lastId = pilotMapper.getLastId();
-                for (Excel pilot : excelList) {
-                    lastId++;
-                    pilotMapper.insertByExcel(lastId,pilot,0);
-                }
+                pilotMapper.listInsertExcel(null, excelList,0);
+//                for (Excel pilot : excelList) {
+//                    lastId++;
+//                    System.out.println( lastId );
+//                    pilotMapper.insertByExcel(lastId,pilot,0);
+//                }
             } catch (Exception e) {
                 map.put("msg","导入的数据格式有误或者与当前已存在的数据中存在重复");
                 return map;
