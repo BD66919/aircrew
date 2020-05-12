@@ -35,7 +35,7 @@
                         <td th:text="${pilot.line}">1</td>
                         <td th:text="${pilot.tcc}">1</td>
                         <td th:text="${pilot.properties}">1</td>
-                        <td th:text="${pilot.date}">1</td>
+                        <td th:text="${pilot.date}+' '+${pilot.time}">1</td>
                         <td>
                             <a  href="#" th:href="@{/pilot/id=}+${pilot.id}" class="btn btn-sm btn-warning "  style="color:#FFFFFF">忽略</a>
                             <a  href="#" th:href="@{/pilot/eid=}+${pilot.eid}" class="btn btn-sm btn-success">查询</a>
@@ -45,8 +45,8 @@
                 </table>
                 <div style="text-align:left">
                     <a  href="/aircrew/errorExcelDownloads" class="btn btn-success">下载异常人员数据</a>
-                    <a  href="/aircrew/pilot/pilotcheck/record"  class="btn btn-success">查看已忽略人员</a>
-                    <a  href="/aircrew/pilot.html" class="btn btn-success"  >返回</a>
+                    <a  href="/aircrew/pilot/pilotcheck/record" class="btn btn-success">查看已忽略人员</a>
+                    <a  href="/aircrew/pilot.html" class="btn btn-success">返回</a>
                 </div>
                 <div style="text-align: center">
                     共 <span th:text="${errorPilotInfo.total}"></span> 条记录</p>
@@ -58,4 +58,5 @@
         </form>
     </div>
 </div>
+
 </body></html>

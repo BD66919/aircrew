@@ -34,7 +34,7 @@
                         <td th:text="${pilot.line}">1</td>
                         <td th:text="${pilot.tcc}">1</td>
                         <td th:text="${pilot.properties}">1</td>
-                        <td th:text="${pilot.date}">1</td>
+                        <td th:text="${pilot.date}+' '+${ pilot.time}">1</td>
                         <td>
                             <a  href="#" th:href="@{/pilot/pilotcheck/ErrorUpdata=}+${pilot.id}" class="btn btn-sm btn-primary">编辑</a>
                             <button th:attr="del_uri=@{/pilot/pilotcheck/deletePilot=}+${pilot.id}"  class="btn btn-sm btn-danger deleteBtn">删除</button>

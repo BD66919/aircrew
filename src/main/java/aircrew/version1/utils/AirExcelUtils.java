@@ -1,7 +1,7 @@
 package aircrew.version1.utils;
 
+import aircrew.version1.entity.Air;
 import aircrew.version1.entity.Excel;
-import aircrew.version1.entity.Soc;
 import org.apache.poi.ss.usermodel.*;
 
 import java.io.InputStream;
@@ -14,10 +14,9 @@ import java.util.List;
  * @Description 该类用于读取excel文件中的数据
  *
  */
-public class SocExcelUtils {
-
-    public static List<Soc> excelToSocList(InputStream inputStream) {
-        List<Soc> Excellist = new ArrayList<>();
+public class AirExcelUtils {
+    public static List<Air> addAir(InputStream inputStream) {
+        List<Air> Excellist = new ArrayList<>();
         Workbook workbook = null;
         Date datetime = null;
         try {
@@ -35,14 +34,6 @@ public class SocExcelUtils {
             //总列数
             int colLength = row.getLastCellNum();
 
-            int nameSub = 0;
-            int eidSub = 1;
-            int depSub = 2;
-            int arrSub = 3;
-            int proSub = 4;
-            int postSub = 5;
-            int sttSub = 6;
-            int edtSub = 7;
             int[] subArr = new int[8];
 
             Cell cell1 = row.getCell(0);
@@ -84,7 +75,7 @@ public class SocExcelUtils {
             //得到指定的单元格
             Cell cell = row.getCell(0);
             for (int i = 1; i <= rowLength; i++) {
-                Soc SocExcel = new Soc();
+                Air SocExcel = new Air();
                 row = sheet.getRow(i);
                 for (int j = 0; j < 8; j++) {
                     //列： 0姓名   1工号   2离港   3到港   4性质   5职务   6起飞    7落地

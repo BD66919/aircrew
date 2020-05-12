@@ -1,5 +1,7 @@
 package aircrew.version1.controller;
+import aircrew.version1.entity.Mp;
 import aircrew.version1.entity.Pilot;
+import aircrew.version1.mapper.MpRepository;
 import aircrew.version1.mapper.PilotMapper;
 import aircrew.version1.mapper.PilotRepository;
 import com.github.pagehelper.PageInfo;
@@ -26,6 +28,9 @@ public class PilotCheckController {
     @Autowired
     PilotMapper pilotMapper;
 
+    @Autowired
+    MpRepository mpRepository;
+
     @GetMapping("/pilot/pilotcheck/checkresult")
     public String result(){ return "/pilot/pilotcheck/checkresult.html"; }
 
@@ -42,14 +47,15 @@ public class PilotCheckController {
      */
     @GetMapping("/pilot/eid={eid}")
     public String selectEid(@PathVariable("eid")  int eid, Model model){
-        List<Pilot> pilotListEid = pilotRepository.getByEid(eid);//
-        Collections.sort(pilotListEid, new Comparator<Pilot>() {
+        //List<Pilot> pilotListEid = pilotRepository.getByEid(eid);//
+        List<Mp> mpListEid =  mpRepository.findByEid(eid);
+        Collections.sort(mpListEid, new Comparator<Mp>() {
             @Override
-            public int compare(Pilot p1, Pilot p2) {
+            public int compare(Mp p1, Mp p2) {
                 return p1.getDate().compareTo(p2.getDate());
             }
         });
-        PageInfo<Pilot> selectPilotListInfo = new PageInfo<Pilot>(pilotListEid);
+        PageInfo<Mp> selectPilotListInfo = new PageInfo<Mp>(mpListEid);
         model.addAttribute("selectPilotListInfo",selectPilotListInfo);
         model.addAttribute("data","1");
         return "/pilot/pilotcheck/checkresult";

@@ -1,8 +1,12 @@
 package aircrew.version1.controller;
 
+import aircrew.version1.entity.Mp;
 import aircrew.version1.entity.Pilot;
+import aircrew.version1.mapper.AirRepository;
+import aircrew.version1.mapper.MpRepository;
 import aircrew.version1.mapper.PilotMapper;
 import aircrew.version1.mapper.PilotRepository;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,23 +32,36 @@ public class PilotController {
     @Autowired
     PilotRepository pilotRepository;
 
+    @Autowired
+    AirRepository airRepository;
+
+    @Autowired
+    MpRepository mpRepository;
+
     @GetMapping("/pilot/findAll")
     public List<Pilot> findAll(){
         return pilotRepository.findAll();
     }
 
-
+//    /**
+//     * 跳转至pilot主页面
+//     */
+//    @GetMapping("/pilot")
+//    public String pilot(Model model,
+//                       @RequestParam(defaultValue = "1",value = "pageNum") Integer pageNum){
+//        PageHelper.startPage(pageNum,10);
+//        List<Pilot> pilotList = pilotMapper.list();
+//        PageInfo<Pilot> pilotPageInfo = new PageInfo<Pilot>(pilotList);
+//        model.addAttribute("pilotPageInfo",pilotPageInfo);
+//        return "/pilot/pilot.html";
+//    }
 
     /**
      * 跳转至pilot主页面
      */
     @GetMapping("/pilot")
-    public String pilot(Model model,
-                       @RequestParam(defaultValue = "1",value = "pageNum") Integer pageNum){
-        PageHelper.startPage(pageNum,10);
-        List<Pilot> pilotList = pilotMapper.list();
-        PageInfo<Pilot> pilotPageInfo = new PageInfo<Pilot>(pilotList);
-        model.addAttribute("pilotPageInfo",pilotPageInfo);
+    public String pilot(Model model){
+        pilotRepository.getByEid(0);
         return "/pilot/pilot.html";
     }
 
@@ -99,28 +116,31 @@ public class PilotController {
      */
     @GetMapping(value="/pilot/pilotcheck/check")
     public String check(Model model){
-        List<Pilot> pilotListByOrder = pilotMapper.ByOrder();
-        List<Pilot> errorPilotList = new ArrayList<>();
+        List<Mp> pilotListByOrder = mpRepository.ByOrder();
+//        List<Pilot> pilotListByOrder = pilotMapper.ByOrder();
+        List<Mp> errorPilotList = new ArrayList<>();
+
         if(pilotListByOrder.isEmpty()) {
-            PageInfo<Pilot> errorPilotInfo = new PageInfo<Pilot>(pilotListByOrder);
+            PageInfo<Mp> errorPilotInfo = new PageInfo<Mp>(pilotListByOrder);
             model.addAttribute("errorPilotInfo",errorPilotInfo);
             return "pilot/pilotcheck/check.html";
         }
+
         int length = 0;
         int length2 = 0;
         String startTcc ;
         String endTcc ;
         for(int i = 0;i<pilotListByOrder.size()-1;i++){
-            Pilot pilot1 = pilotListByOrder.get(i);
-            Pilot pilot2 = pilotListByOrder.get(i+1);
+            Mp pilot1 = pilotListByOrder.get(i);
+            Mp pilot2 = pilotListByOrder.get(i+1);
             length = pilot1.getTcc().length();
             length2 = pilot2.getTcc().length();
-            if (length==0 || length2 == 0) {//长度为零时进入下一次判断
+            if (length==0 || length2 == 0) {//长度为零时进入下一次判断，防止被调机、正班以外的情况干扰
                 continue;
             }
-            if(pilot1.getError()==1){
-                continue;
-            }
+//            if(pilot1.getError()==1){
+//                continue;
+//            }
             if (pilot2.getEid() != pilot1.getEid()) {
                 continue;
             }
@@ -136,7 +156,7 @@ public class PilotController {
                 errorPilotList.remove(i);
             }
         }
-        PageInfo<Pilot> errorPilotInfo = new PageInfo<Pilot>(errorPilotList);
+        PageInfo<Mp> errorPilotInfo = new PageInfo<Mp>(errorPilotList);
         model.addAttribute("errorPilotInfo",errorPilotInfo);
         return "/pilot/pilotcheck/check.html";
     }

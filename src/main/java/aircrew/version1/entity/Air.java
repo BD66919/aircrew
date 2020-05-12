@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @Data
-public class Soc {
+public class Air {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -35,25 +35,25 @@ public class Soc {
     @Column
     private String endTime;
 
-    public Soc(Integer id,int eid,String name,String dep,String arr,String properties,String post,String startTime,String endTime){
-        this.id = id;
-        this.eid = eid;
-        this.name = name;
-        this.dep = dep;
-        this.arr = arr;
-        this.properties = properties;
-        this.post = post;
-        this.startTime = startTime;
-        this.endTime = endTime;
-    }
+//    public Air(Integer id,int eid,String name,String dep,String arr,String properties,String post,String startTime,String endTime){
+//        this.id = id;
+//        this.eid = eid;
+//        this.name = name;
+//        this.dep = dep;
+//        this.arr = arr;
+//        this.properties = properties;
+//        this.post = post;
+//        this.startTime = startTime;
+//        this.endTime = endTime;
+//    }
 
-    public Soc(){
+    public Air(){
 
     }
 
     @Override
     public String toString(){
-        return "Soc{" +
+        return "Air{" +
                 "id=" + id +
                 "eid=" + eid +
                 "name=" + name +

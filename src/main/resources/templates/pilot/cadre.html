@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <link rel="icon" href="http://www.airchina.com.cn/favicon.ico" />
+    <title>机组数据系统</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="/aircrew/static/asserts/css/dashboard.css" rel="stylesheet" />
+</head>
+
+<style>
+    th{
+        font-size : 17px;
+    }
+    td{
+        font-size : 17px;
+    }
+    a{
+        font-size : 15px;
+    }
+    label{
+        font-size : 13px;
+    }
+    p{
+        font-size : 15px;
+    }
+    .progress {
+        width: 550px;
+        height: 10px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        margin: 10px 0px;
+        overflow: hidden;
+    }
+    /* 初始状态设置进度条宽度为0px */
+    .progress > div {
+        width: 0px;
+        height: 100%;
+        background-color: yellowgreen;
+        transition: all .3s ease;
+    }
+</style>
+
+<body th:inline="text">
+<div class="container-fluid">
+    <div class="row">
+        <div th:replace="commons/bar::sidebar(activeUri='pilot')"></div>
+        <main role="main" class="col-md-2 ml-sm-auto col-lg-11 px-4">
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th>员工编号</th>
+                        <th>姓名</th>
+                        <th>部门</th>
+                        <th>技术资格</th>
+                        <th>空勤人员类别</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!--/*@thymesVar id="cadreList" type="Cadre"*/-->
+                    <tr th:each="cadre:${cadreList}">
+                        <td th:text="${cadre.eid}"></td>
+                        <td th:text="${cadre.name}"></td>
+                        <td th:text="${cadre.department}"></td>
+                        <td th:text="${cadre.qualify}"></td>
+                        <td th:text="${cadre.category}"></td>
+                        <td>
+<!--                            <button class="btn-sm btn-success" data-toggle="modal" data-target="#edit" th:onclick="javascript:editCadre([[${cadre.eid}]],[[${cadre.name}]],[[${cadre.department}]],[[${cadre.qualify}]],[[${cadre.category}]]);">编辑</button>-->
+                            <button class="btn-sm btn-success" data-toggle="modal" data-target="#edit" th:data-eid="${cadre.eid}" th:data-name="${cadre.name}" th:data-department="${cadre.department}" th:data-qualify="${cadre.qualify}" th:data-category="${cadre.category}" >编辑</button>
+                            <button th:attr="del_uri=@{/deleteCadre=}+${cadre.id}"  class="btn btn-sm btn-danger deleteBtn">删除</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="modal fade" id="edit" tabindex="-1" role="dialog" aria-labelledby="addUpLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-footer">
+                <div class="form-group" align="left">
+                    <label for="eid" >员工编号(不可修改)</label>
+                    <input type="text" class="form-control" id = "eid" name="eid" placeholder="员工号" readonly="readonly"/>
+                </div>
+
+                <div class="form-group" align="left">
+                    <label for="name" >姓名</label>
+                    <input type="text" class="form-control" id ="name" name="name" placeholder="姓名" />
+                </div>
+
+                <div class="form-group" align="left">
+                    <label for="department">部门</label>
+                    <input type="text" class="form-control" id = "department" name="department" placeholder="部门" />
+                </div>
+
+                <div class="form-group" align="left">
+                    <label for="qualify">技术资格</label>
+                    <input type="text" class="form-control" id = "qualify" name="qualify" placeholder="技术资格" />
+                </div>
+
+                <div class="form-group" align="left">
+                    <label for="category">空勤人员类别</label>
+                    <input type="text" class="form-control" id = "category" name="category" placeholder="空勤人员类别" />
+                </div>
+                <span id="cadreStatus" style="color: red"></span>
+                <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+                <button type="submit" class="btn btn-success" id="updateCadreSubmit" th:text="修改" ></button>
+            </div>
+        </div>
+    </div>
+    <form id="deleteCadreForm" method="post">
+        <input type="hidden" name="_method" value="delete"/>
+    </form>
+</div>
+
+
+</body>
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+
+    // function editCadre(eid,name,department,qualify,category){
+    //     // alert(department);
+    //     // alert(qualify);
+    //     // alert(category);
+    //     // alert(name);
+    //     // alert(eid);
+    //     $('#eid').html(eid);
+    //     document.getElementById("department").innerHTML=department;
+    // }
+
+    $('#edit').on("show.bs.modal",function(e){
+        var eid = $(e.relatedTarget).data("eid");
+        var name = $(e.relatedTarget).data("name");
+        var department = $(e.relatedTarget).data("department");
+        var qualify = $(e.relatedTarget).data("qualify");
+        var category = $(e.relatedTarget).data("category");
+        var modal = $(this);
+        modal.find('#eid').val(eid);
+        modal.find('#name').val(name);
+        modal.find('#department').val(department);
+        modal.find('#qualify').val(qualify);
+        modal.find('#category').val(category);
+    });
+
+    $('#updateCadreSubmit').click(function (){
+        var eid = document.getElementById("eid").value;
+        var name = document.getElementById("name").value;
+        var department = document.getElementById("department").value;
+        var qualify = document.getElementById("qualify").value;
+        var category = document.getElementById("category").value;
+        $.ajax({
+            type:"post",
+            url:"/aircrew/updateCadre",
+            data:{
+                eid : eid,
+                name : name,
+                department : department,
+                qualify : qualify,
+                category : category
+            },
+            dataType : "json",
+            success : function(data) {
+                var msg = data.msg;
+                if(msg==="修改成功")
+                    $('#cadreStatus').css('color','green');
+                else
+                    $('#cadreStatus').css('color','red');
+                $('#cadreStatus').html(msg);
+                location.reload(true);
+            }
+        })
+    });
+
+    $(".deleteBtn").click(function () {
+        if(confirm('确认删除?')){
+        $("#deleteCadreForm").attr("action",$(this).attr("del_uri")).submit();
+        }
+        else
+            return false;
+    })
+
+</script>
+</html>
