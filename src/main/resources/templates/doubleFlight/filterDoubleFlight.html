@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>双组航线查看</title>
+    <link href="/aircrew/static/asserts/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
+    <link href="/aircrew/static/asserts/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="/aircrew/static/asserts/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <style>
+        td {
+            font-size: 1px;
+        }
+
+        th {
+            font-size: 1px;
+        }
+    </style>
+</head>
+
+<body id="page-top" class="sidebar-toggled" onload="IniEvent()">
+<div id="wrapper">
+    <div id="content-wrapper" class="d-flex flex-column" style="position: relative;width: 100%;">
+        <div id="content">
+            <nav class="navbar navbar-expand navbar-light bg-white topbar static-top shadow">
+                <div>
+                    <div>
+                        <h1 class="h3 text-gray-700 mb-4" style="margin-left:10px;margin-top: 30px;">飞行任务书审核辅助系统</h1>
+                    </div>
+                </div>
+                <a>
+                    <a style="display:block;position:absolute;right:5%;top:50%;color:grey"
+                       href="/aircrew/doubleFlight/flight.html">返回</a>
+                    <a style="display:block;position:absolute;right:1%;top:50%;color:grey" href="/aircrew/logout">退出</a>
+                </a>
+            </nav>
+            <div class="container-fluid" style="background-color: white;margin-top: 10px;">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">双组航线查看</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                <tr>
+                                    <th>日期</th>
+                                    <th>航班</th>
+                                    <th>航线</th>
+                                    <th>三字码</th>
+                                    <th>机组1</th>
+                                    <th>资质1</th>
+                                    <th>机组2</th>
+                                    <th>资质2</th>
+                                    <th>机组组合</th>
+                                    <th>双组航线</th>
+                                    <th>过夜航班</th>
+                                    <th>阶段双组</th>
+                                    <th>检查航线</th>
+                                    <th>干部</th>
+                                    <th>飞行部资质修改记录</th>
+                                    <th>飞行部修改说明</th>
+                                    <th>人力部资质修改记录</th>
+                                    <th>人力部修改说明</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="doubleFlight:${doubleFlightList}">
+                                    <td th:text="${doubleFlight.date}"></td>
+                                    <td th:text="${doubleFlight.no}"></td>
+                                    <td th:text="${doubleFlight.line}"></td>
+                                    <td th:text="${doubleFlight.tcc}"></td>
+                                    <td th:text="${doubleFlight.firstPosition}"></td>
+                                    <td th:text="${doubleFlight.firstQualification}"></td>
+                                    <td th:text="${doubleFlight.secondPosition}"></td>
+                                    <td th:text="${doubleFlight.secondQualification}"></td>
+                                    <td th:text="${doubleFlight.flightCombine}"></td>
+                                    <td th:text="${doubleFlight.doubleLine}"></td>
+                                    <td th:text="${doubleFlight.nightFlight}"></td>
+                                    <td th:text="${doubleFlight.stageDoubleFlight}"></td>
+                                    <td th:text="${doubleFlight.flightCheck}"></td>
+                                    <td th:text="${doubleFlight.cadre}"></td>
+                                    <td th:text="${doubleFlight.airChangeRecord}"></td>
+                                    <td th:text="${doubleFlight.airRemark}"></td>
+                                    <td th:text="${doubleFlight.mpChangeRecord}"></td>
+                                    <td th:text="${doubleFlight.mpRemark}"></td>
+                                    <td>
+                                        <button class="btn-small btn-primary" data-toggle="modal" data-target="#edit"
+                                                th:data-id="${doubleFlight.id}"
+                                                th:data-line="${doubleFlight.line}"
+                                                th:data-firstposition="${doubleFlight.firstPosition}"
+                                                th:data-firstqualification="${doubleFlight.firstQualification}"
+                                                th:data-secondposition="${doubleFlight.secondPosition}"
+                                                th:data-secondqualification="${doubleFlight.secondQualification}"
+                                                th:data-doubleline="${doubleFlight.doubleLine}"
+                                                th:data-nightflight="${doubleFlight.nightFlight}"
+                                                th:data-stagedoubleflight="${doubleFlight.stageDoubleFlight}"
+                                                th:data-flightcheck="${doubleFlight.flightCheck}"
+                                                th:data-cadre="${doubleFlight.cadre}">修改
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="text-align: center">
+                            <p><a style="display:block;position:absolute;left:2%;color:grey"
+                                  href="/aircrew/doubleFlight/flight.html">返回</a>共 <span th:text="${count}"></span> 条数据
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="edit" tabindex="-1" role="dialog" aria-labelledby="addUpLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="form-group" align="left" style="display: none;">
+                    <label for="id">id</label>
+                    <input type="text" class="form-control" id="id" name="id" readonly="readonly"/>
+                </div>
+                <div class="form-group" align="left">
+                    <label for="line">航线</label>
+                    <input type="text" class="form-control" id="line" name="line"/>
+                </div>
+                <div class="form-group" align="left">
+                    <label for="firstPosition">机组1</label>
+                    <input type="text" class="form-control" id="firstPosition" name="firstPosition"/>
+                </div>
+                <div class="form-group" align="left">
+                    <label for="firstQualification">资质1</label>
+                    <input type="text" class="form-control" id="firstQualification" name="firstQualification"/>
+                </div>
+                <div class="form-group" align="left">
+                    <label for="secondPosition">机组2</label>
+                    <input type="text" class="form-control" id="secondPosition" name="secondPosition"/>
+                </div>
+                <div class="form-group" align="left">
+                    <label for="secondQualification">资质2</label>
+                    <input type="text" class="form-control" id="secondQualification"
+                           name="secondQualification"/>
+                </div>
+                <div class="form-group" align="left">
+                    <label for="doubleLine">双组航线检查</label>
+                    <input type="text" class="form-control" id="doubleLine" name="doubleLine"/>
+                </div>
+
+                <div class="form-group" align="left">
+                    <label for="nightFlight">过夜航班</label>
+                    <input type="text" class="form-control" id="nightFlight" name="nightFlight"/>
+                </div>
+                <div class="form-group" align="left">
+                    <label for="stageDoubleFlight">阶段双组</label>
+                    <input type="text" class="form-control" id="stageDoubleFlight" name="stageDoubleFlight"/>
+                </div>
+                <div class="form-group" align="left">
+                    <label for="flightCheck">C检查航线</label>
+                    <input type="text" class="form-control" id="flightCheck" name="flightCheck"/>
+                </div>
+                <div class="form-group" align="left">
+                    <label for="cadre">飞行管理人员</label>
+                    <input type="text" class="form-control" id="cadre" name="cadre"/>
+                </div>
+                <div class="form-group" align="left">
+                    <label for="remarks">修改说明</label>
+                    <input type="text" class="form-control" id="remarks" name="remarks"/>
+                </div>
+
+                <span id="doubleFlightStatus" style="color: red"></span>
+                <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+                <button type="submit" class="btn btn-success" id="updateFilterDoubleFlightSubmit"
+                        th:text="修改"></button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="http://localhost:8088/aircrew/static/asserts/vendor/jquery/jquery.min.js"></script>
+<script src="http://localhost:8088/aircrew/static/asserts/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="http://localhost:8088/aircrew/static/asserts/vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="http://localhost:8088/aircrew/static/asserts/js/sb-admin-2.min.js"></script>
+<script src="http://localhost:8088/aircrew/static/asserts/js/data.js"></script>
+<script>
+
+    $('#edit').on("show.bs.modal", function (e) {
+        var id = $(e.relatedTarget).data("id");
+        var line = $(e.relatedTarget).data("line");
+        var firstPosition = $(e.relatedTarget).data("firstposition");
+        var firstQualification = $(e.relatedTarget).data("firstqualification");
+        var secondPosition = $(e.relatedTarget).data("secondposition");
+        var secondQualification = $(e.relatedTarget).data("secondqualification");
+        var doubleLine = $(e.relatedTarget).data("doubleline");
+        var nightFlight = $(e.relatedTarget).data("nightflight");
+        var stageDoubleFlight = $(e.relatedTarget).data("stagedoubleflight");
+        var flightCheck = $(e.relatedTarget).data("flightcheck");
+        var cadre = $(e.relatedTarget).data("cadre");
+        var modal = $(this);
+
+        modal.find('#id').val(id);
+        modal.find('#line').val(line);
+        modal.find('#firstPosition').val(firstPosition);
+        modal.find('#firstQualification').val(firstQualification);
+        modal.find('#secondPosition').val(secondPosition);
+        modal.find('#secondQualification').val(secondQualification);
+        modal.find('#doubleLine').val(doubleLine);
+        modal.find('#nightFlight').val(nightFlight);
+        modal.find('#stageDoubleFlight').val(stageDoubleFlight);
+        modal.find('#flightCheck').val(flightCheck);
+        modal.find('#cadre').val(cadre);
+
+    });
+
+    $('#updateFilterDoubleFlightSubmit').click(function () {
+        var id = document.getElementById("id").value;
+        var line = document.getElementById("line").value;
+        var firstPosition = document.getElementById("firstPosition").value;
+        var firstQualification = document.getElementById("firstQualification").value;
+        var secondPosition = document.getElementById("secondPosition").value;
+        var secondQualification = document.getElementById("secondQualification").value;
+        var doubleLine = document.getElementById("doubleLine").value;
+        var nightFlight = document.getElementById("nightFlight").value;
+        var stageDoubleFlight = document.getElementById("stageDoubleFlight").value;
+        var flightCheck = document.getElementById("flightCheck").value;
+        var cadre = document.getElementById("cadre").value;
+        var remarks = document.getElementById("remarks").value;
+
+        $.ajax({
+            type: "post",
+            url: "/aircrew/doubleFlight/updateFilterDoubleFlight",
+            data: {
+                id: id,
+                line: line,
+                firstPosition: firstPosition,
+                firstQualification: firstQualification,
+                secondPosition: secondPosition,
+                secondQualification: secondQualification,
+                doubleLine: doubleLine,
+                nightFlight: nightFlight,
+                stageDoubleFlight: stageDoubleFlight,
+                flightCheck: flightCheck,
+                cadre: cadre,
+                remarks: remarks
+            },
+            dataType: "json",
+            success: function (data) {
+                var msg = data.msg;
+                if (msg === "修改成功")
+                    $('#doubleFlightStatus').css('color', 'green');
+                else
+                    $('#doubleFlightStatus').css('color', 'red');
+                $('#doubleFlightStatus').html(msg);
+                self.setInterval(function () {  // 这个方法是说在延迟两秒后执行大括号里的方法
+                    location.reload(true);   // 这个方法是刷新当前页面
+                }, 3000);
+            }
+        })
+    });
+
+    function IniEvent() {
+        var tbl = document.getElementById("dataTable");
+        var trs = tbl.getElementsByTagName("tr"); //getElementsByTagName(按标记名获取元素)
+        for (var i = 0; i < trs.length; i++) {
+            trs[i].onclick = TrOnClick;
+        }
+    }
+
+    function TrOnClick() {
+        var tbl = document.getElementById("dataTable");
+        var trs = tbl.getElementsByTagName("tr");
+        for (var i = 0; i < trs.length; i++) {
+            if (trs[i] === this) {  //判断是不是当前选择的行
+                trs[i].style.background = "AliceBlue";
+            } else {
+                trs[i].style.background = "white";
+            }
+        }
+    }
+
+
+</script>
+</html>

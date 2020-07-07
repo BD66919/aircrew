@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>财务与飞行数据对比</title>
+    <link href="/aircrew/static/asserts/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="/aircrew/static/asserts/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="/aircrew/static/asserts/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+</head>
+
+<body id="page-top" class="sidebar-toggled">
+<div id="wrapper" >
+    <div th:insert="commons/bar::sidebar"></div>
+    <div id="content-wrapper" class="d-flex flex-column" style="position: relative;left: 100px;width: 93%;" >
+        <div id="content">
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-5 static-top shadow">
+                <div >
+                    <div >
+                        <h1 class="h3 text-gray-700 mb-4" style="margin-left:10px;margin-top: 30px;">飞行任务书审核辅助系统</h1>
+                    </div>
+                </div>
+                <a>
+                    <a style="display:block;position:absolute;right:1%;top:30%;color:grey"  href="/aircrew/logout" >退出</a>
+                </a>
+            </nav>
+            <div class="container-fluid">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">财务数据与飞行数据比对</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                <tr>
+                                    <th>日期</th>
+                                    <th>航班号</th>
+                                    <th>机号</th>
+                                    <th>离港</th>
+                                    <th>到港</th>
+                                    <th>滑行</th>
+                                    <th>起飞</th>
+                                    <th>落地</th>
+                                    <th>到位</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="air:${airList}">
+                                    <td th:text="${air.date}"></td>
+                                    <td th:text="${air.flightNo}"></td>
+                                    <td th:text="${air.flightNumber}"></td>
+                                    <td th:text="${air.dep}"></td>
+                                    <td th:text="${air.arr}"></td>
+                                    <td th:text="${air.slideTime}"></td>
+                                    <td th:text="${air.takeOffTime}"></td>
+                                    <td th:text="${air.landTime}"></td>
+                                    <td th:text="${air.inPlaceTime}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.container-fluid -->
+            <!-- Bootstrap core JavaScript-->
+            <script src="http://localhost:8088/aircrew/static/asserts/vendor/jquery/jquery.min.js"></script>
+            <script src="http://localhost:8088/aircrew/static/asserts/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+            <!-- Core plugin JavaScript-->
+            <script src="http://localhost:8088/aircrew/static/asserts/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+            <!-- Custom scripts for all pages-->
+            <script src="http://localhost:8088/aircrew/static/asserts/js/sb-admin-2.min.js"></script>
+            <script src="http://localhost:8088/aircrew/static/asserts/js/data.js"></script>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

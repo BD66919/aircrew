@@ -1,21 +1,18 @@
 package aircrew.version1.controller;
-
-import aircrew.version1.entity.Pilot;
-import aircrew.version1.mapper.PilotMapper;
-import aircrew.version1.mapper.PilotRepository;
-import aircrew.version1.mapper.UserMapper;
+import aircrew.version1.mapper.*;
+import aircrew.version1.service.DataService;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,95 +27,41 @@ import java.util.Map;
 
 @Controller
 public class LoginController {
-    @Autowired
-    UserMapper userMapper;
-    String userName;
-    String userPwd;
 
     @Autowired
-    PilotMapper pilotMapper;
+    private  UserRepository userRepository;
 
     @Autowired
-    PilotRepository pilotRepository;
+    private DataService dataService;
 
-    @PostMapping(value = "/userLogin")
+    @Autowired
+    public LoginController(DataService dataService){
+        this.dataService = dataService;
+    }
+
+    @RequestMapping(value="/userLogin",method= RequestMethod.POST)
     public String userLogin(@RequestParam("loginName") String loginName,
                             @RequestParam("loginPwd") String loginPwd,
                             Map<String,Object> map,
-                            HttpSession session,
-                            Model model){
-        userName = userMapper.getUserName(loginName);
-        userPwd = userMapper.getUserPwd(loginPwd,loginName);
-        if (userName == null || userPwd == null){
-            map.put("message","用户名或者密码错误");
-            return "login.html";
-        }else if (userName.equals(loginName) && userPwd.equals(loginPwd)){
+                            Model model,
+                            HttpSession session){
+        Subject subject = SecurityUtils.getSubject();
+        UsernamePasswordToken token = new UsernamePasswordToken(loginName,loginPwd);
+        String userName = userRepository.getUserName(loginName);
+        String department = userRepository.getDepartment(loginName);
+        try{
+            subject.login(token);
             session.setAttribute("userName",userName);
-
-            return "main.html";
-        }else{
-            map.put("message","用户名或者密码错误");
+            session.setAttribute("department",department);
+            model.addAllAttributes(dataService.login());
+            return "data/data.html";
+        }catch(UnknownAccountException e){
+            map.put("message","用户名错误");
+            return "login.html";
+        }catch(IncorrectCredentialsException e){
+            map.put("message","密码错误");
             return "login.html";
         }
-    }
-
-    @GetMapping("/main")
-    public String main(Model model){
-        List<Pilot> pilotList = pilotMapper.ByOrder();
-        List<Pilot> errorPilotList = new ArrayList<>();
-        List<Pilot> fisrtPilotList = new ArrayList<>();
-        if(pilotList.isEmpty())
-            return  "login.html";
-        int number = 0;
-        int id = pilotList.get(0).getId();
-        int eid = pilotList.get(0).getEid();
-        int length = pilotList.get(0).getTcc().length();
-        String date ;
-        String a1 ;
-        String b ;
-        Pilot pilot1;
-        Pilot pilot2;
-        date = pilotRepository.getByDate(id);
-        try{date = date.substring(0,4)+"年"+date.substring(5,7);
-        } catch(Exception e) {
-            date = "空空空空空空空空空空空空";
-        }
-        String end = pilotList.get(0).getTcc();
-        end = end.substring(length-3,length);
-        for(Pilot a:pilotList) {
-            length = a.getTcc().length();
-            if (length==0)//长度为零时进入下一次判断
-                continue;
-            if(a.getError()==1){
-                end = a.getTcc().substring(length - 3, length);
-                continue;
-            }
-            if (eid != a.getEid()) {
-                eid = a.getEid();
-                end = a.getTcc().substring(length - 3, length);
-                continue;
-            }
-            b = a.getTcc();
-            a1 = b.substring(0,3);
-            if (!end.equals(a1)){
-                errorPilotList.add(a);
-            }
-            length = a.getTcc().length();
-            end = b.substring(length-3,length);
-        }
-        fisrtPilotList.add(errorPilotList.get(0));
-        for(int i = 0;i<errorPilotList.size()-1;i++){
-            pilot1 = errorPilotList.get(i);
-            pilot2 = errorPilotList.get(i+1);
-            if(pilot1.getEid()!=pilot2.getEid()){
-                fisrtPilotList.add(pilot1);
-                number++;
-            }
-        }
-        model.addAttribute("firstPilotList",fisrtPilotList);
-        model.addAttribute("number",number);
-        model.addAttribute("date",date);
-        return "main.html";
     }
 
     @RequestMapping("/logout")
@@ -127,6 +70,11 @@ public class LoginController {
         while(em.hasMoreElements()){
             request.getSession().removeAttribute(em.nextElement().toString());
         }
+        Subject subject = SecurityUtils.getSubject();
+            if (subject.isAuthenticated()) {
+                subject.logout();
+            }
         return "login.html";
     }
+
 }

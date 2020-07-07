@@ -1,27 +1,72 @@
+
 <!DOCTYPE html>
 <!-- saved from url=(0051)https://getbootstrap.com/docs/4.1/examples/sign-in/ -->
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
     <link rel="icon" href="http://www.airchina.com.cn/favicon.ico" />
-    <title>机组数据系统登录页面</title>
-    <link href="/aircrew/static/asserts/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/aircrew/static/asserts/css/signin.css" rel="stylesheet">
+    <title>飞行任务书审核辅助系统登录页面</title>
+    <!-- Custom fonts for this template-->
+
+    <link href="/aircrew/static/asserts/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+
+    <link href="/aircrew/static/asserts/css/sb-admin-2.min.css" rel="stylesheet">
 </head>
 
-<body class="text-center" th:inline="text">
-<form class="form-signin" action="/aircrew/userLogin" method="post">
-    <img class="mb-4" src="/aircrew/static/asserts/img/logo2.JPG" alt="" width=300 height=300>
-    <h1 class="h3 mb-3 font-weight-normal" >机组数据系统</h1>
-    <p style="color: red" th:text="${message}" th:if="${not #strings.isEmpty(message)}"></p>
-    <label class="sr-only" >用户名</label>
-    <input type="text"  name="loginName" class="form-control" placeholder="用户名" required="" autofocus=""/>
-    <label class="sr-only" >密码</label>
-    <input type="password" name="loginPwd"  class="form-control" placeholder="密码"  required="" />
-    <button class="btn btn-lg btn-primary btn-block" type="submit" >提交</button>
-    <p class="mt-5 mb-3 text-muted">中国国际航空公司重庆分公司</p>
-</form>
-</body></html>
+<body class="bg-gradient-primary">
+<br>
+<br>
+<br>
+<div class="container">
+    <!-- Outer Row -->
+    <div class="row justify-content-center">
+        <div class="col-xl-9 col-lg-12 col-md-9">
+            <div class="card o-hidden border-0 shadow-lg my-5">
+                <div class="card-body p-1">
+                    <!-- Nested Row within Card Body -->
+                    <div class="row">
+                        <img class="mb-4" src="/aircrew/static/asserts/img/logo2.JPG" alt=""  width=400 height=434 style=" margin-left:10px;margin-top: 30px;"/>
+                        <div class="col-lg-6">
+                            <div class="p-5">
+                                <br>
+                                <br>
+                                <div class="text-center">
+                                    <h1 class="h4 text-gray-900 mb-4">飞行任务书审核辅助系统</h1>
+                                    <p style="color: red" th:text="${message}" th:if="${not #strings.isEmpty(message)}"></p>
+                                </div>
+                                <form class="text-center" action="/aircrew/userLogin" method="post">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-control-user"  name="loginName" placeholder="请输入用户名" required="" autofocus=""/>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="password" class="form-control form-control-user" name="loginPwd" placeholder="请输入密码" required="" />
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-user btn-block">
+                                        登陆
+                                    </button>
+                                </form>
+                                <hr>
+                                <div class="text-center">
+                                    <br>
+                                    <h1 class="h5 text-gray-800 mb-4">中国国际航空公司重庆分公司</h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+

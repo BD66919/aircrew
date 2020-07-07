@@ -8,41 +8,101 @@ import javax.persistence.*;
 @Data
 @Table(name = "mp")
 public class Mp {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column
-    private String name;
+    private int eid;
 
     @Column
-    private int eid;
+    private String name;
 
     @Column
     private String date;
 
     @Column
-    private String time;
+    private String takeOffTime;
 
     @Column
-    private String FlightNo;
+    private String flightNo;
 
     @Column
-    private String properties;
+    private String airplaneNumber;
+
+    @Column
+    private String type;
+
+    @Column
+    private String property;
 
     @Column
     private String post;
 
     @Column
-    private String line;
+    private String isNight;
+
+    @Column
+    private String isInternational;
+
+    @Column
+    private String isCost;
+
+    @Column
+    private String isTake;
+
+    @Column
+    private String realTime;
+
+    @Column
+    private String airLine;
 
     @Column
     private String tcc;
 
-    public Mp(){
+    @Column
+    private String specialAirlineProportion;
 
+    @Column
+    private String specialAirlineDays;
+
+    @Column
+    private String eachAirlineTime;
+
+    @Column
+    private String eachAirlineProportion;
+
+    @Column
+    private String isEachAirlineInternational;
+
+    @Column
+    private String reversal;
+
+    @Column
+    private String remarks;
+
+    @Column
+    private String payTime;
+
+    @Column
+    private String organization;
+
+    @Column
+    private String department;
+
+    @Column
+    private String errorStatement;
+
+    public Mp(){
     }
 
-
+    public  Mp(String date,int eid,String name,String airLine,String tcc,String flightNo,String property){
+        this.date = date;
+        this.eid = eid;
+        this.name = name;
+        this.airLine = airLine;
+        this.tcc = tcc;
+        this.flightNo = flightNo;
+        this.property = property;
+    }
 }
