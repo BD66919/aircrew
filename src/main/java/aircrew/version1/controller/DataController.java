@@ -48,7 +48,7 @@ public class DataController {
      * 跳转至pilot主页面
      */
     @GetMapping("/data/data")
-    public String pilot(Model model){
+    public String data(Model model){
         model.addAllAttributes(dataService.login());
         return "data/data.html";
     }
@@ -103,6 +103,12 @@ public class DataController {
     @ResponseBody
     public Map<String, Object> addStageDoubleFlight(HttpServletRequest request){
         return dataService.addStageDoubleFlight(request);
+    }
+
+    @PostMapping(value = "/deleteAll")
+    @ResponseBody
+    public Map<String,Object> deleteAll(){
+        return dataService.deleteAll();
     }
 
     @PostMapping(value = "/deleteMp")

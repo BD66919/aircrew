@@ -24,6 +24,9 @@ public interface MpRepository extends JpaRepository<Mp,Integer> {
     @Query(value = "select * from mp WHERE eid=?1 ORDER BY date ,takeOffTime",nativeQuery = true)
     List<Mp> findByEid(int eid);
 
+    @Query(value = "select * from mp WHERE property='调组乘机乘车' ",nativeQuery = true)
+    List<Mp> findByProperty();
+
     @Transactional
     @Modifying
     @Query(value = "truncate table mp",nativeQuery = true)

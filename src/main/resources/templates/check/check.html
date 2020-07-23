@@ -41,10 +41,7 @@
             <div class="container-fluid" style="background-color: white;margin-top: 10px;">
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <a class="m-0 font-weight-bold text-muted" href="/aircrew/check/check.html"
-                           th:class="${activeUri}=='check'?'m-0 font-weight-bold text-primary':'m-0 font-weight-bold text-muted'">飞行闭环检查</a>
-                        <a class="m-0 font-weight-bold text-muted" href="/aircrew/check/socCheck.html"
-                           th:class="${activeUri}=='socCheck'?'m-0 font-weight-bold text-primary':'m-0 font-weight-bold text-muted'">/SOC修正闭环检查</a>
+                        <h6 class="m-0 font-weight-bold text-primary">飞行闭环检查</h6>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -54,7 +51,6 @@
                                     <th>日期</th>
                                     <th>人员编号</th>
                                     <th>姓名</th>
-                                    <th>航线</th>
                                     <th>城市三字码</th>
                                     <th>航班号</th>
                                     <th>任务性质</th>
@@ -65,13 +61,15 @@
                                     <td th:text="${pilot.date}"></td>
                                     <td th:text="${pilot.eid}"></td>
                                     <td th:text="${pilot.name}"></td>
-                                    <td th:text="${pilot.airLine}"></td>
                                     <td th:text="${pilot.tcc}"></td>
                                     <td th:text="${pilot.flightNo}"></td>
                                     <td th:text="${pilot.property}"></td>
                                 </tr>
                                 </tbody>
                             </table>
+                            <div>
+                                <a href="/aircrew/check/excelDownload" type="button" class="btn btn-primary">下载检查数据</a>
+                            </div>
                         </div>
                         <div style="text-align: center">
                             共 <span th:text="${errorPilotInfo.total}"></span> 条记录

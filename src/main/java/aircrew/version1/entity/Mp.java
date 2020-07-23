@@ -96,11 +96,10 @@ public class Mp {
     public Mp(){
     }
 
-    public  Mp(String date,int eid,String name,String airLine,String tcc,String flightNo,String property){
+    public  Mp(String date,int eid,String name,String tcc,String flightNo,String property){
         this.date = date;
         this.eid = eid;
         this.name = name;
-        this.airLine = airLine;
         this.tcc = tcc;
         this.flightNo = flightNo;
         this.property = property;

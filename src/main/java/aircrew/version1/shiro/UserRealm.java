@@ -21,14 +21,17 @@ public class UserRealm extends AuthorizingRealm{
         if(arg0.getPrimaryPrincipal().equals("财务")) {
             info.addStringPermission("user:data");
             info.addStringPermission("user:check");
+            info.addStringPermission("user:fl");
         }
         if(arg0.getPrimaryPrincipal().equals("飞行")) {
             info.addStringPermission("user:add");
             info.addStringPermission("user:update");
+            info.addStringPermission("user:air");
         }
         if(arg0.getPrimaryPrincipal().equals("人力")) {
             info.addStringPermission("user:add");
             info.addStringPermission("user:update");
+            info.addStringPermission("user:mp");
         }
 
 

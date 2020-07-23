@@ -8,26 +8,26 @@
     <meta name="author" content="">
     <title>飞行任务书审核辅助系统</title>
     <link href="/aircrew/static/asserts/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
     <link href="/aircrew/static/asserts/css/sb-admin-2.min.css" rel="stylesheet">
     <link href="/aircrew/static/asserts/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
 
-
-
 <body id="page-top">
+
 <div id="wrapper">
     <div th:replace="commons/bar2::sidebar"></div>
     <div id="content-wrapper" class="d-flex flex-column">
         <div id="content">
             <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                <div >
-                    <div >
+                <div>
+                    <div>
                         <h1 class="h3 text-gray-700 mb-4" style="margin-left:10px;margin-top: 30px;">飞行任务书审核辅助系统</h1>
                     </div>
                 </div>
                 <a>
-                    <a style="display:block;position:absolute;right:1%;top:30%;color:grey"  href="/aircrew/logout" >退出</a>
+                    <a style="display:block;position:absolute;right:1%;top:30%;color:grey" href="/aircrew/logout">退出</a>
                 </a>
             </nav>
             <div class="container-fluid">
@@ -38,72 +38,83 @@
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
-                    <tr>
-                        <th>系统中双机长航班表情况</th>
-                        <th>最后一条数据</th>
-                        <th>数据总量</th>
-                        <th>财务部确认状态</th>
-                        <th>飞行部确认状态</th>
-                        <th>人力部确认状态</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td th:text="${doubleFlight}"></td>
-                        <td th:text="${doubleFlightState}" ></td>
-                        <td th:text="${doubleFlightCount}"></td>
-                        <td th:text="${flConfirm}"></td>
-                        <td th:text="${airConfirm}"></td>
-                        <td th:text="${mpConfirm}"></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div style="text-align:left">
+                                <thead>
+                                <tr>
+                                    <th>系统中双机长航班表情况</th>
+                                    <th>最后一条数据</th>
+                                    <th>数据总量</th>
+                                    <th>财务部确认状态</th>
+                                    <th>飞行部确认状态</th>
+                                    <th>人力部确认状态</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td th:text="${doubleFlight}"></td>
+                                    <td th:text="${doubleFlightState}"></td>
+                                    <td th:text="${doubleFlightCount}"></td>
+                                    <td th:text="${flConfirm}"></td>
+                                    <td th:text="${airConfirm}"></td>
+                                    <td th:text="${mpConfirm}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="text-align:left">
+                            <div class="btn-group">
+                                <button class="btn-lg btn-primary dropdown-toggle" data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false">
+                                    查看双机长航班 <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/aircrew/doubleFlight/doubleFlight.html" class="dropdown-item">查看所有双机长航班</a>
+                                    </li>
+                                    <li><a href="/aircrew/doubleFlight/filterDoubleFlight.html" class="dropdown-item">查看不符合条件的双机长航班</a>
+                                    </li>
+                                    <li><a href="" data-toggle="modal" data-target="#addProperty" data-dismiss="modal"
+                                           class="dropdown-item">添加机组资质</a></li>
+                                    <li><a href="/aircrew/doubleFlight/property.html" class="dropdown-item">查看机组资质</a>
+                                </ul>
+                            </div>
+                            <div class="btn-group" shiro:hasPermission="user:fl">
+                                <button class="btn-lg btn-primary " data-toggle="modal" data-target="#doubleFlight"
+                                        aria-haspopup="true" aria-expanded="false">
+                                    计算生成双机长航班
+                                </button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn-lg btn-primary " id="downloadDoubleFlight">
+                                    下载双机长航班表
+                                </button>
+                            </div>
 
-                <div class="btn-group">
-                    <button  class="btn-lg btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        查看双机长航班 <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" >
-                        <li><a  href="/aircrew/doubleFlight/doubleFlight.html" class="dropdown-item">查看所有双机长航班</a></li>
-                        <li><a  href="/aircrew/doubleFlight/filterDoubleFlight.html" class="dropdown-item">查看不符合条件的双机长航班</a></li>
-                    </ul>
+                            <div class="btn-group" shiro:hasPermission="user:fl">
+                                <button class="btn-lg btn-primary dropdown-toggle" data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false">
+                                    下载财务数据 <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="javascript:void(0);" Onclick="downloadFlMtoJ()" class="dropdown-item">下载财务数据（
+                                        M改J ）</a>
+                                    </li>
+                                    <li><a href="javascript:void(0);" Onclick="downloadFl()" class="dropdown-item">下载财务数据（
+                                        M不改J )</a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="btn-group">
+                                <button class="btn-lg btn-primary " th:text="${department}+'部确认'" id="confirm">
+                                </button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn-lg btn-primary " id="cancelConfirm">
+                                    取消确认
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="btn-group" shiro:hasPermission="user:data">
-                    <button  class="btn-lg btn-primary " data-toggle="modal" data-target="#doubleFlight" aria-haspopup="true" aria-expanded="false">
-                        计算生成双机长航班
-                    </button>
-                </div>
-
-                <div class="btn-group">
-                    <button  class="btn-lg btn-primary " id="downloadDoubleFlight">
-                        下载双机长航班表
-                    </button>
-                </div>
-
-                <div class="btn-group"  shiro:hasPermission="user:data">
-                    <button  class="btn-lg btn-primary " data-toggle="modal" data-target="#flCheck" aria-haspopup="true" aria-expanded="false">
-                        下载财务数据
-                    </button>
-                </div>
-
-                <div class="btn-group">
-                    <button  class="btn-lg btn-primary " th:text="${department}+'部确认'" id="confirm">
-                    </button>
-                </div>
-
-                <div class="btn-group">
-                    <button  class="btn-lg btn-primary " id="cancelConfirm" >
-                        取消确认
-                    </button>
-                 </div>
-
-            </div>
-            </div>
-        </div>
             </div>
         </div>
         <footer class="sticky-footer bg-white">
@@ -115,6 +126,7 @@
         </footer>
     </div>
 </div>
+
 <div class="modal fade" id="doubleFlight" tabindex="-1" role="dialog" aria-labelledby="addUpLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -123,21 +135,24 @@
             </div>
             <div class="modal-body"></div>
             <p style="color: red">&nbsp;&nbsp;&nbsp;&nbsp;提交后将生成新的双机长航班表，原有双机长航班表将被覆盖。</p>
-            <p style="color: red">&nbsp;&nbsp;&nbsp;    各部门确认状态将重置。</p>
+            <p style="color: red">&nbsp;&nbsp;&nbsp; 各部门确认状态将重置。</p>
             <p>&nbsp;&nbsp;&nbsp;&nbsp;请选择双组航班满足条件时是否标注以下信息</p>
             <div class="checkbox">
                 <label>&nbsp;&nbsp;&nbsp;&nbsp;
                     <input name="doubleFlight" type="checkbox" value="doubleFlight">
                     标注双组航线
                 </label>
+                <br>
                 <label>&nbsp;&nbsp;&nbsp;&nbsp;
                     <input name="cadre" type="checkbox" value="cadre">
                     标注干部飞行员
                 </label>
+                <br>
                 <label>&nbsp;&nbsp;&nbsp;&nbsp;
                     <input name="nightFlight" type="checkbox" value="nightFlight">
                     标注过夜航班
                 </label>
+                <br>
                 <label>&nbsp;&nbsp;&nbsp;&nbsp;
                     <input name="stageDoubleFlight" type="checkbox" value="stageDoubleFlight">
                     标注阶段双组航班
@@ -145,35 +160,30 @@
             </div>
             <div class="modal-footer">
                 <span id="Status" style="color: red"></span>
-                <button type="button" class="btn btn-default" data-dismiss="modal" >退出</button>
-                <input type="submit" value="生成" class="btn btn-success"  id="calculateSubmit"  >
+                <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+                <input type="submit" value="生成" class="btn btn-success" id="calculateSubmit">
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="flCheck" tabindex="-1" role="dialog" aria-labelledby="addUpLabel" aria-hidden="true">
+<div class="modal fade" id="addProperty" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
-            <div class="modal-body"></div>
-            <p>&nbsp;&nbsp;&nbsp;&nbsp;是否M改J(调组乘机除外)</p>
-            <div class="checkbox">
-                <label>&nbsp;&nbsp;&nbsp;&nbsp;
-                    <input name="flCheck" type="radio" value="True">
-                    是
-                </label>
-                <label>&nbsp;&nbsp;&nbsp;&nbsp;
-                    <input name="flCheck" type="radio" value="False">
-                    否
-                </label>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal" >退出</button>
-                <input type="submit" value="提交" class="btn btn-success"  id="downloadFl"  >
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="property">机组资质</label>
+                    <input type="text" class="form-control" id="property" name="stageDoubleFlightNumber"
+                           placeholder="机组资质"/>
+                </div>
+                <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+                <button type="submit" class="btn btn-success" id="addPropertySubmit" th:text="添加"></button>
+                <span id="propertyStatus" style="color: red"></span>
             </div>
         </div>
     </div>
 </div>
+
 </body>
 
 <script src="http://localhost:8088/aircrew/static/asserts/vendor/jquery/jquery.min.js"></script>
@@ -183,9 +193,9 @@
 <script src="http://localhost:8088/aircrew/static/asserts/js/data.js"></script>
 
 <script>
-    $(function() {
+    $(function () {
         $('#calculateSubmit').click(function () {
-            $("#Status").css('color',"red");
+            $("#Status").css('color', "red");
             $("#Status").html("生成中");
             var $doubleFlight = jQuery("input[name='doubleFlight']:checked").val();
             var $cadre = jQuery("input[name='cadre']:checked").val();
@@ -195,21 +205,45 @@
             $.ajax({
                 type: "post",
                 url: "/aircrew/doubleFlight/calculateFlight",
-                data: {"doubleFlight":$doubleFlight,
-                    "cadre":$cadre,
-                    "nightFlight":$nightFlight,
-                    "stageDoubleFlight":$stageDoubleFlight},
-                dataType:"json",
+                data: {
+                    "doubleFlight": $doubleFlight,
+                    "cadre": $cadre,
+                    "nightFlight": $nightFlight,
+                    "stageDoubleFlight": $stageDoubleFlight
+                },
+                dataType: "json",
                 success: function (data) {
                     var msg = data.msg;
-                    if(msg === "双机长航班表已生成")
-                        $("#Status").css('color',"green");
-                        self.setInterval(function () {  // 这个方法是说在延迟两秒后执行大括号里的方法
-                            location.reload(true);   // 这个方法是刷新当前页面
-                        }, 2000);
+                    if (msg === "双机长航班表已生成")
+                        $("#Status").css('color', "green");
+                    self.setInterval(function () {  // 这个方法是说在延迟两秒后执行大括号里的方法
+                        location.reload(true);   // 这个方法是刷新当前页面
+                    }, 2000);
                     $("#Status").html(msg);
                 }
             });
+        });
+
+        $('#addPropertySubmit').click(function () {
+            var property = document.getElementById("property").value;
+            document.getElementById("propertyStatus").innerHTML = "";
+            $.ajax({
+                type: "post",
+                url: "/aircrew/addProperty",
+                data: {
+                    property: property
+                },
+                dataType: "json",
+                success: function (data) {
+                    var msg = data.msg;
+                    if (msg === "添加成功") {
+                        $('#propertyStatus').css('color', 'green');
+                    } else {
+                        $('#propertyStatus').css('color', 'red');
+                    }
+                    $('#propertyStatus').html(msg);
+                }
+            })
         });
 
         $('#confirm').click(function () {
@@ -230,7 +264,7 @@
                 url: "/aircrew/doubleFlight/cancelConfirm",
                 success: function (data) {
                     var msg = data.msg;
-                    if(msg === "存在尚未确认的部门，无法下载")
+                    if (msg === "存在尚未确认的部门，无法下载")
                         alert(msg);
                     self.setInterval(function () {  // 这个方法是说在延迟两秒后执行大括号里的方法
                         location.reload(true);   // 这个方法是刷新当前页面
@@ -245,9 +279,9 @@
                 url: "/aircrew/doubleFlight/downloadJudge",
                 success: function (data) {
                     var msg = data.msg;
-                    if(msg === "存在尚未确认的部门")
-                        alert("由于"+msg+"，无法下载");
-                    else if(msg === "三部门已确认")
+                    if (msg === "存在尚未确认的部门")
+                        alert("由于" + msg + "，无法下载");
+                    else if (msg === "三部门已确认")
                         window.location.href = "/aircrew/doubleFlight/downloadDoubleFlight";
                 }
             });
@@ -260,16 +294,62 @@
                 url: "/aircrew/doubleFlight/downloadJudge",
                 success: function (data) {
                     var msg = data.msg;
-                    if(msg === "存在尚未确认的部门")
-                        alert("由于"+msg+"，无法下载");
-                    else if(msg === "三部门已确认")
-                        if($true==="True")
+                    if (msg === "存在尚未确认的部门")
+                        alert("由于" + msg + "，无法下载");
+                    else if (msg === "三部门已确认")
+                        if ($true === "True")
                             window.location.href = "/aircrew/doubleFlight/downloadFlMtoJ";
                         else
                             window.location.href = "/aircrew/doubleFlight/downloadFl";
                 }
             });
         });
-    })
+
+        $('#downloadFl').click(function () {
+            var $true = jQuery("input[name='flCheck']:checked").val();
+            $.ajax({
+                type: "POST",
+                url: "/aircrew/doubleFlight/downloadJudge",
+                success: function (data) {
+                    var msg = data.msg;
+                    if (msg === "存在尚未确认的部门")
+                        alert("由于" + msg + "，无法下载");
+                    else if (msg === "三部门已确认")
+                        if ($true === "True")
+                            window.location.href = "/aircrew/doubleFlight/downloadFlMtoJ";
+                        else
+                            window.location.href = "/aircrew/doubleFlight/downloadFl";
+                }
+            });
+        });
+    });
+
+    function downloadFlMtoJ() {
+        $.ajax({
+            type: "POST",
+            url: "/aircrew/doubleFlight/downloadJudge",
+            success: function (data) {
+                var msg = data.msg;
+                if (msg === "存在尚未确认的部门")
+                    alert("由于" + msg + "，无法下载");
+                else if (msg === "三部门已确认")
+                    window.location.href = "/aircrew/doubleFlight/downloadFlMtoJ";
+            }
+        });
+    }
+
+    function downloadFl() {
+        $.ajax({
+            type: "POST",
+            url: "/aircrew/doubleFlight/downloadJudge",
+            success: function (data) {
+                var msg = data.msg;
+                if (msg === "存在尚未确认的部门")
+                    alert("由于" + msg + "，无法下载");
+                else if (msg === "三部门已确认")
+                    window.location.href = "/aircrew/doubleFlight/downloadFl";
+            }
+        });
+    }
 </script>
 </html>

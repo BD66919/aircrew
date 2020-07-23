@@ -67,7 +67,7 @@
                                     <th>飞行部修改说明</th>
                                     <th>人力部资质修改记录</th>
                                     <th>人力部修改说明</th>
-                                    <th>操作</th>
+                                    <th shiro:hasAnyPermissions="user:air,user:mp">操作</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -90,8 +90,9 @@
                                     <td th:text="${doubleFlight.airRemark}"></td>
                                     <td th:text="${doubleFlight.mpChangeRecord}"></td>
                                     <td th:text="${doubleFlight.mpRemark}"></td>
-                                    <td>
+                                    <td shiro:hasAnyPermissions="user:air,user:mp">
                                         <button class="btn-small btn-primary" data-toggle="modal" data-target="#edit"
+                                                shiro:hasPermission="user:air"
                                                 th:data-id="${doubleFlight.id}"
                                                 th:data-line="${doubleFlight.line}"
                                                 th:data-firstposition="${doubleFlight.firstPosition}"
@@ -102,8 +103,25 @@
                                                 th:data-nightflight="${doubleFlight.nightFlight}"
                                                 th:data-stagedoubleflight="${doubleFlight.stageDoubleFlight}"
                                                 th:data-flightcheck="${doubleFlight.flightCheck}"
-                                                th:data-cadre="${doubleFlight.cadre}">修改
+                                                th:data-cadre="${doubleFlight.cadre}"
+                                                th:data-remark="${doubleFlight.airRemark}">修改
                                         </button>
+                                        <button class="btn-small btn-primary" data-toggle="modal" data-target="#edit"
+                                                shiro:hasPermission="user:mp"
+                                                th:data-id="${doubleFlight.id}"
+                                                th:data-line="${doubleFlight.line}"
+                                                th:data-firstposition="${doubleFlight.firstPosition}"
+                                                th:data-firstqualification="${doubleFlight.firstQualification}"
+                                                th:data-secondposition="${doubleFlight.secondPosition}"
+                                                th:data-secondqualification="${doubleFlight.secondQualification}"
+                                                th:data-doubleline="${doubleFlight.doubleLine}"
+                                                th:data-nightflight="${doubleFlight.nightFlight}"
+                                                th:data-stagedoubleflight="${doubleFlight.stageDoubleFlight}"
+                                                th:data-flightcheck="${doubleFlight.flightCheck}"
+                                                th:data-cadre="${doubleFlight.cadre}"
+                                                th:data-remark="${doubleFlight.mpRemark}">修改
+                                        </button>
+
                                     </td>
                                 </tr>
                                 </tbody>
@@ -136,18 +154,23 @@
                     <label for="firstPosition">机组1</label>
                     <input type="text" class="form-control" id="firstPosition" name="firstPosition"/>
                 </div>
-                <div class="form-group" align="left">
+                <div class="form-group">
                     <label for="firstQualification">资质1</label>
-                    <input type="text" class="form-control" id="firstQualification" name="firstQualification"/>
+                    <br>
+                    <select class="form-control" id="firstQualification">
+                        <option th:each="result:${propertiesList}" th:text="${result}"></option>
+                    </select>
                 </div>
                 <div class="form-group" align="left">
                     <label for="secondPosition">机组2</label>
                     <input type="text" class="form-control" id="secondPosition" name="secondPosition"/>
                 </div>
-                <div class="form-group" align="left">
+                <div class="form-group">
                     <label for="secondQualification">资质2</label>
-                    <input type="text" class="form-control" id="secondQualification"
-                           name="secondQualification"/>
+                    <br>
+                    <select class="form-control" id="secondQualification">
+                        <option th:each="result:${propertiesList}" th:text="${result}"></option>
+                    </select>
                 </div>
                 <div class="form-group" align="left">
                     <label for="doubleLine">双组航线检查</label>
@@ -164,10 +187,26 @@
                 </div>
                 <div class="form-group" align="left">
                     <label for="flightCheck">C检查航线</label>
+                    <label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input name="checkSelect1" type="checkbox" value="1">
+                        机组1
+                    </label>
+                    <label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input name="checkSelect2" type="checkbox" value="2">
+                        机组2
+                    </label>
                     <input type="text" class="form-control" id="flightCheck" name="flightCheck"/>
                 </div>
                 <div class="form-group" align="left">
                     <label for="cadre">飞行管理人员</label>
+                    <label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input name="cadreSelect1" type="checkbox" value="1">
+                        机组1
+                    </label>
+                    <label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input name="cadreSelect2" type="checkbox" value="2">
+                        机组2
+                    </label>
                     <input type="text" class="form-control" id="cadre" name="cadre"/>
                 </div>
                 <div class="form-group" align="left">
@@ -190,7 +229,6 @@
 <script src="http://localhost:8088/aircrew/static/asserts/js/sb-admin-2.min.js"></script>
 <script src="http://localhost:8088/aircrew/static/asserts/js/data.js"></script>
 <script>
-
     $('#edit').on("show.bs.modal", function (e) {
         var id = $(e.relatedTarget).data("id");
         var line = $(e.relatedTarget).data("line");
@@ -203,8 +241,8 @@
         var stageDoubleFlight = $(e.relatedTarget).data("stagedoubleflight");
         var flightCheck = $(e.relatedTarget).data("flightcheck");
         var cadre = $(e.relatedTarget).data("cadre");
+        var remark = $(e.relatedTarget).data("remark");
         var modal = $(this);
-
         modal.find('#id').val(id);
         modal.find('#line').val(line);
         modal.find('#firstPosition').val(firstPosition);
@@ -216,6 +254,7 @@
         modal.find('#stageDoubleFlight').val(stageDoubleFlight);
         modal.find('#flightCheck').val(flightCheck);
         modal.find('#cadre').val(cadre);
+        modal.find('#remarks').val(remark);
 
     });
 
@@ -232,7 +271,10 @@
         var flightCheck = document.getElementById("flightCheck").value;
         var cadre = document.getElementById("cadre").value;
         var remarks = document.getElementById("remarks").value;
-
+        var $checkSelect1 = jQuery("input[name='checkSelect1']:checked").val();
+        var $checkSelect2 = jQuery("input[name='checkSelect2']:checked").val();
+        var $cadreSelect1 = jQuery("input[name='cadreSelect1']:checked").val();
+        var $cadreSelect2 = jQuery("input[name='cadreSelect2']:checked").val();
         $.ajax({
             type: "post",
             url: "/aircrew/doubleFlight/updateFilterDoubleFlight",
@@ -248,7 +290,11 @@
                 stageDoubleFlight: stageDoubleFlight,
                 flightCheck: flightCheck,
                 cadre: cadre,
-                remarks: remarks
+                remarks: remarks,
+                checkSelect1: $checkSelect1,
+                checkSelect2: $checkSelect2,
+                cadreSelect1: $cadreSelect1,
+                cadreSelect2: $cadreSelect2
             },
             dataType: "json",
             success: function (data) {
@@ -260,7 +306,7 @@
                 $('#doubleFlightStatus').html(msg);
                 self.setInterval(function () {  // 这个方法是说在延迟两秒后执行大括号里的方法
                     location.reload(true);   // 这个方法是刷新当前页面
-                }, 3000);
+                }, 1500);
             }
         })
     });
@@ -284,7 +330,5 @@
             }
         }
     }
-
-
 </script>
 </html>

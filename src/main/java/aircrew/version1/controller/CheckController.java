@@ -6,25 +6,26 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 @Controller
 public class CheckController {
     @Autowired
     CheckService checkService;
 
     /**
-     * 跳转至飞行员飞行及调度路线校验页面
+     *
      */
     @GetMapping(value="/check/check")
     public String check(Model model){
         return checkService.check(model);
     }
 
-    /**
-     * 跳转至飞行员飞行及调度路线校验页面
-     */
-    @GetMapping(value="/check/socCheck")
-    public String socCheck(Model model){
-        return checkService.socCheck(model);
+    @GetMapping(value="/check/excelDownload")
+    public void check(HttpServletResponse response) throws IOException {
+        checkService.excelDownload(response);
     }
+
 
 }

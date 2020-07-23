@@ -50,7 +50,6 @@
                         <td>
                             <button class="btn-sm btn-primary" data-toggle="modal" data-target="#edit" th:data-airline="${airline.airline}" th:data-remarks="${airline.remarks}">编辑</button>
                             <button th:attr="del_uri=@{/deleteAirline=}+${airline.airline}"  class="btn btn-sm btn-danger deleteBtn">删除</button>
-
                         </td>
                     </tr>
                     </tbody>

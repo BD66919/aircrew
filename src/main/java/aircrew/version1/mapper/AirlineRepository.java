@@ -8,5 +8,5 @@ import org.springframework.stereotype.Component;
 @Component
 public interface AirlineRepository extends JpaRepository<Airline,String> {
     @Query(value = "select * from airline where airline=?1",nativeQuery = true)
-    public Airline findByAirline(String airline);
+    Airline findByAirline(String airline);
 }

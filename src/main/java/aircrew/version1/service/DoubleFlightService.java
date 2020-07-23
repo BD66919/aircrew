@@ -1,6 +1,7 @@
 package aircrew.version1.service;
 
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -8,7 +9,10 @@ import java.io.IOException;
 import java.util.Map;
 
 public interface DoubleFlightService {
+
+    Map<String,Object> addProperty(HttpServletRequest request);
     String flight(Model model, HttpServletRequest request);
+    String property(Model model);
     Map<String, Object> calculateFlight(HttpServletRequest request);
     String doubleFlight(Model model);
     String filterDoubleFlight(Model model);
@@ -20,4 +24,6 @@ public interface DoubleFlightService {
     void downloadDoubleFlight(HttpServletResponse response) throws IOException;
     void downloadFlMtoJ(HttpServletResponse response) throws IOException;
     void downloadFl(HttpServletResponse response) throws IOException;
+    String deleteProperty(@PathVariable String property);
+
 }

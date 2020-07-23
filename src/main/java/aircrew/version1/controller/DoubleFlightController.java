@@ -22,6 +22,15 @@ public class DoubleFlightController {
        return doubleFlightService.flight(model, request);
     }
 
+    @GetMapping(value = "/doubleFlight/property")
+    public String property(Model model) { return doubleFlightService.property(model); }
+
+    @PostMapping(value = "/addProperty")
+    @ResponseBody
+    public Map<String, Object> addProperty(HttpServletRequest request){
+        return doubleFlightService.addProperty(request);
+    }
+
     @PostMapping(value = "/doubleFlight/calculateFlight")
     @ResponseBody
     public Map<String, Object> calculateFlight(HttpServletRequest request) {
@@ -83,4 +92,8 @@ public class DoubleFlightController {
         doubleFlightService.downloadFl(response);
     }
 
+    @PostMapping(value = "/deleteProperty={property}")
+    public String deleteAirline(@PathVariable String property){
+        return doubleFlightService.deleteProperty(property);
+    }
 }

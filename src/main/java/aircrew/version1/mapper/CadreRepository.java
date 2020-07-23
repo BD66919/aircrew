@@ -8,6 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 public interface CadreRepository extends JpaRepository<Cadre,Integer> {
     @Query(value = "select * from cadre where eid=?1",nativeQuery = true)
-    public Cadre findByEid(int eid);
+    Cadre findByEid(int eid);
 
 }

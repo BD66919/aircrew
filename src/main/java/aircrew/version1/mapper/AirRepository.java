@@ -20,7 +20,7 @@ public interface AirRepository extends JpaRepository<Air,Integer> {
     @Query(value = "select arr from air where date=?1 and flightNo =?2 and eid=?3 ORDER BY takeOffTime",nativeQuery = true)
     List<String> arr(String date,String no,int eid);
 
-    @Query(value = "select * from air  ORDER BY date,takeOffTime",nativeQuery = true)
+    @Query(value = "select * from air  ORDER BY date,takeOffTime,eid",nativeQuery = true)
     List<Air> findAllBySort();
 
     @Transactional

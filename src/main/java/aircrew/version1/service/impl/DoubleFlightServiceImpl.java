@@ -3,6 +3,7 @@ package aircrew.version1.service.impl;
 import aircrew.version1.entity.*;
 import aircrew.version1.mapper.*;
 import aircrew.version1.service.DoubleFlightService;
+import aircrew.version1.utils.FlExcelUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
@@ -10,11 +11,11 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 @Service
@@ -28,7 +29,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
     private final NightFlightRepository nightFlightRepository;
 
     @Autowired
-    DoubleFlightServiceImpl(MpRepository mpRepository, AirRepository airRepository, CadreRepository cadreRepository, DoubleFlightRepository doubleFlightRepository, StageDoubleFlightRepository stageDoubleFlightRepository, AirlineRepository airlineRepository, NightFlightRepository nightFlightRepository){
+    DoubleFlightServiceImpl(MpRepository mpRepository, AirRepository airRepository, CadreRepository cadreRepository, DoubleFlightRepository doubleFlightRepository, StageDoubleFlightRepository stageDoubleFlightRepository, AirlineRepository airlineRepository, NightFlightRepository nightFlightRepository) {
         this.mpRepository = mpRepository;
         this.airRepository = airRepository;
         this.cadreRepository = cadreRepository;
@@ -36,6 +37,20 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
         this.stageDoubleFlightRepository = stageDoubleFlightRepository;
         this.airlineRepository = airlineRepository;
         this.nightFlightRepository = nightFlightRepository;
+    }
+
+    @Override
+    public Map<String,Object> addProperty(HttpServletRequest request){
+        Map<String,Object> map = new HashMap<>();
+        String property = request.getParameter("property");
+        List<String> propertiesList = doubleFlightRepository.propertiesList();
+        if(propertiesList.contains(property)){
+            map.put("msg","已存在该资质");
+            return map;
+        }
+        doubleFlightRepository.addProperty(property);
+        map.put("msg","添加成功");
+        return map;
     }
 
     @Override
@@ -80,6 +95,13 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                 model.addAttribute("mpConfirm", "已确认");
         }
         return "/doubleFlight/flight.html";
+    }
+
+    @Override
+    public String property(Model model) {
+        List<String> propertiesList = doubleFlightRepository.propertiesList();
+        model.addAttribute("propertiesList",propertiesList);
+        return "/doubleFlight/property.html";
     }
 
     @Override
@@ -192,16 +214,18 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                 String combine = doubleFlight.getFirstQualification().substring(0, 1) + doubleFlight.getSecondQualification().substring(0, 1);
                 doubleFlight1.setFlightCombine(combine);
 
-
+                boolean flag = true;
                 if (cadreStatus != null)
                     if (cadreDate.equals(doubleFlight.getDate()) && cadreNo.equals(doubleFlight.getNo())) {
                         doubleFlight1.setCadre(cadre);
+                        flag = false;
                     }
 
                 if (doubleFlightStatus != null)
                     for (Airline airline : airlines) {
                         if (doubleFlight1.getTcc().contains(airline.getAirline())) {
                             doubleFlight1.setDoubleLine("双组航线");
+                            flag = false;
                         }
                     }
 
@@ -209,6 +233,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                     for (NightFlight nightFlight : nightFlightList) {
                         if (doubleFlight1.getNo().contains(nightFlight.getNumber())) {
                             doubleFlight1.setNightFlight("过夜航班");
+                            flag = false;
                         }
                     }
 
@@ -216,14 +241,18 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                     for (StageDoubleFlight stageDoubleFlight : stageDoubleFlightList) {
                         if (doubleFlight1.getNo().contains(stageDoubleFlight.getNumber())) {
                             doubleFlight1.setStageDoubleFlight("阶段双组航班");
+                            flag = false;
                         }
                     }
                 if (cadreStatus != null)
                     if (doubleFlight1.getFirstQualification().equals("C飞行检查员") || doubleFlight1.getSecondQualification().equals("C飞行检查员")) {
                         if (doubleFlight1.getCadre() == null) {
                             doubleFlight1.setFlightCheck("C检查航线");
+                            flag = false;
                         }
                     }
+                if (flag)
+                    doubleFlight1.setIsFlag(true);
                 doubleFlightList.add(doubleFlight1);
                 cadre = "";
                 doubleFlight.setFirstPosition(null);
@@ -234,8 +263,8 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                 number2 = 0;
             }
         }
-        doubleFlightRepository.saveAll(doubleFlightList);
 
+        doubleFlightRepository.saveAll(doubleFlightList);
         map.put("msg", "双机长航班表已生成");
         return map;
     }
@@ -252,14 +281,15 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
     public String filterDoubleFlight(Model model) {
         List<DoubleFlight> doubleFlightList = doubleFlightRepository.findAll();
         for (int i = 0; i < doubleFlightList.size(); i++) {
-            DoubleFlight doubleFlight1 = doubleFlightList.get(i);
-            if (!doubleFlight1.getDoubleLine().isEmpty() || !doubleFlight1.getNightFlight().isEmpty() || !doubleFlight1.getStageDoubleFlight().isEmpty() || !doubleFlight1.getFlightCheck().isEmpty() || !doubleFlight1.getCadre().isEmpty()) {
-                doubleFlightList.remove(doubleFlight1);
+            if (doubleFlightList.get(i).getIsFlag() == null) {
+                doubleFlightList.remove(i);
                 i--;
             }
         }
+        List<String> propertiesList =  doubleFlightRepository.propertiesList();
         model.addAttribute("doubleFlightList", doubleFlightList);
         model.addAttribute("count", doubleFlightList.size());
+        model.addAttribute("propertiesList",propertiesList);
         return "/doubleFlight/filterDoubleFlight.html";
     }
 
@@ -317,10 +347,13 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             //飞行部修改
             if (doubleFlight != null & department.equals("飞行")) {
                 String recorder = "";
+                //资质修改
                 if (!doubleFlight.getFirstQualification().equals(request.getParameter("firstQualification")))
                     recorder = recorder.concat("资质1：" + doubleFlight.getFirstQualification() + "修改为" + request.getParameter("firstQualification")) + ";";
                 if (!doubleFlight.getSecondQualification().equals(request.getParameter("secondQualification")))
                     recorder = recorder.concat("资质2：" + doubleFlight.getSecondQualification() + "修改为" + request.getParameter("secondQualification")) + ";";
+                doubleFlight.setAirChangeRecord(doubleFlight.getAirChangeRecord() + " " + recorder);
+
                 doubleFlight.setLine(request.getParameter("line"));
                 doubleFlight.setFirstPosition(request.getParameter("firstPosition"));
                 doubleFlight.setFirstQualification(request.getParameter("firstQualification"));
@@ -330,11 +363,22 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                 doubleFlight.setNightFlight(request.getParameter("nightFlight"));
                 doubleFlight.setStageDoubleFlight(request.getParameter("stageDoubleFlight"));
                 doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
-                doubleFlight.setCadre(request.getParameter("cadre"));
-                if (!request.getParameter("remarks").equals(""))
-                    doubleFlight.setAirRemark(doubleFlight.getAirRemark() + request.getParameter("remarks") + ";");
+
+                if (doubleFlight.getFlightCheck() != null) {
+                    if (request.getParameter("checkSelect1") != null)
+                        doubleFlight.setFirstQualification("C飞行检查员");
+                    if (request.getParameter("checkSelect2") != null)
+                        doubleFlight.setSecondQualification("C飞行检查员");
+                }
+
+                if (request.getParameter("cadreSelect1") != null)
+                    doubleFlight.setCadre("1" + request.getParameter("cadre"));
+                if (request.getParameter("cadreSelect2") != null)
+                    doubleFlight.setCadre(doubleFlight.getCadre() + " " + "2" + request.getParameter("cadre"));
+
+                doubleFlight.setAirRemark(request.getParameter("remarks"));
                 doubleFlight.setFlightCombine(doubleFlight.getFirstQualification().substring(0, 1) + doubleFlight.getSecondQualification().substring(0, 1));
-                doubleFlight.setAirChangeRecord(doubleFlight.getAirChangeRecord() + " " + recorder);
+
                 doubleFlightRepository.save(doubleFlight);
                 map.put("msg", "修改成功");
                 return map;
@@ -356,10 +400,20 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                     doubleFlight.setDoubleLine(request.getParameter("doubleLine"));
                     doubleFlight.setNightFlight(request.getParameter("nightFlight"));
                     doubleFlight.setStageDoubleFlight(request.getParameter("stageDoubleFlight"));
-                    doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
-                    doubleFlight.setCadre(request.getParameter("cadre"));
-                    if (!request.getParameter("remarks").equals(""))
-                        doubleFlight.setMpRemark(doubleFlight.getMpRemark() + request.getParameter("remarks") + ";");
+
+                    if (doubleFlight.getFlightCheck() != null) {
+                        if (request.getParameter("checkSelect1") != null)
+                            doubleFlight.setFirstQualification("C飞行检查员");
+                        if (request.getParameter("checkSelect2") != null)
+                            doubleFlight.setSecondQualification("C飞行检查员");
+                    }
+
+                    if (request.getParameter("cadreSelect1") != null)
+                        doubleFlight.setCadre("1" + request.getParameter("cadre"));
+                    if (request.getParameter("cadreSelect2") != null)
+                        doubleFlight.setCadre(doubleFlight.getCadre() + " " + "2" + request.getParameter("cadre"));
+
+                    doubleFlight.setMpRemark(request.getParameter("remarks"));
                     doubleFlight.setFlightCombine(doubleFlight.getFirstQualification().substring(0, 1) + doubleFlight.getSecondQualification().substring(0, 1));
                     doubleFlight.setMpChangeRecord(doubleFlight.getMpChangeRecord() + " " + recorder);
                     doubleFlightRepository.save(doubleFlight);
@@ -435,6 +489,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
         sheet.setColumnWidth(18, 3713);
         sheet.setColumnWidth(19, 3713);
         HSSFCellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setWrapText(true);
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setBorderBottom(BorderStyle.THIN);
         cellStyle.setBorderLeft(BorderStyle.THIN);
@@ -443,9 +498,8 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
         List<DoubleFlight> doubleFlightList = doubleFlightRepository.findAll();
         try {
             for (int i = 0; i < doubleFlightList.size(); i++) {
-                DoubleFlight doubleFlight1 = doubleFlightList.get(i);
-                if (!doubleFlight1.getDoubleLine().isEmpty() || !doubleFlight1.getNightFlight().isEmpty() || !doubleFlight1.getStageDoubleFlight().isEmpty() || !doubleFlight1.getFlightCheck().isEmpty() || !doubleFlight1.getCadre().isEmpty()) {
-                    doubleFlightList.remove(doubleFlight1);
+                if (doubleFlightList.get(i).getIsFlag() == null) {
+                    doubleFlightList.remove(i);
                     i--;
                 }
             }
@@ -465,13 +519,17 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             for (DoubleFlight doubleFlight : doubleFlightList) {
                 //设置居中
                 HSSFRow row1 = sheet.createRow(rowNum);
-                String[] value = {String.valueOf(rowNum),doubleFlight.getDate(),doubleFlight.getNo(),doubleFlight.getLine(),doubleFlight.getTcc(),doubleFlight.getFirstPosition(),doubleFlight.getFirstQualification(),doubleFlight.getSecondPosition(),
-                        doubleFlight.getSecondQualification(),doubleFlight.getFlightCombine(),doubleFlight.getDoubleLine(),doubleFlight.getNightFlight(),doubleFlight.getStageDoubleFlight(),doubleFlight.getFlightCheck(),doubleFlight.getCadre(),doubleFlight.getAirChangeRecord(),
-                        doubleFlight.getAirRemark(),doubleFlight.getMpChangeRecord(),doubleFlight.getMpRemark()};
-                for(int i=0;i<headers.length;i++){
+                String[] value = {String.valueOf(rowNum), doubleFlight.getDate(), doubleFlight.getNo(), doubleFlight.getLine(), doubleFlight.getTcc(), doubleFlight.getFirstPosition(), doubleFlight.getFirstQualification(), doubleFlight.getSecondPosition(),
+                        doubleFlight.getSecondQualification(), doubleFlight.getFlightCombine(), doubleFlight.getDoubleLine(), doubleFlight.getNightFlight(), doubleFlight.getStageDoubleFlight(), doubleFlight.getFlightCheck(), doubleFlight.getCadre(), doubleFlight.getAirChangeRecord(),
+                        doubleFlight.getAirRemark(), doubleFlight.getMpChangeRecord(), doubleFlight.getMpRemark()};
+                for (int i = 0; i < headers.length; i++) {
                     cellValue(cellStyle, row1, i, value[i]);
                 }
                 rowNum++;
+            }
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+                sheet.setColumnWidth(i,sheet.getColumnWidth(i)*12/10);
             }
             response.setContentType("application/octet-stream");
             response.setHeader("Content-disposition", "attachment;filename=" + java.net.URLEncoder.encode(fileName, "UTF-8"));
@@ -537,16 +595,20 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             }
             StringBuilder eid = new StringBuilder(String.valueOf(mp.getEid()));
             int length = eid.length();
-            for(int i =0;i<10-length;i++)
+            for (int i = 0; i < 10 - length; i++)
                 eid.insert(0, "0");
-            String[] value = {eid.toString(),mp.getName(),mp.getDate(),mp.getTakeOffTime(),mp.getFlightNo(),mp.getAirplaneNumber(),mp.getType(),mp.getProperty(),mp.getPost(),mp.getIsNight(),
-                    mp.getIsInternational(),mp.getIsCost(),mp.getIsTake(),mp.getRealTime(),mp.getAirLine(),mp.getTcc(),mp.getEachAirlineProportion(),mp.getSpecialAirlineDays(),
-                    mp.getEachAirlineTime(),mp.getEachAirlineProportion(),mp.getIsEachAirlineInternational(),mp.getReversal(),mp.getRemarks(),mp.getPayTime(),mp.getOrganization(),
-                    mp.getDepartment(),mp.getErrorStatement()};
-            for(int i=0;i<headers.length;i++){
+            String[] value = {eid.toString(), mp.getName(), mp.getDate(), mp.getTakeOffTime(), mp.getFlightNo(), mp.getAirplaneNumber(), mp.getType(), mp.getProperty(), mp.getPost(), mp.getIsNight(),
+                    mp.getIsInternational(), mp.getIsCost(), mp.getIsTake(), mp.getRealTime(), mp.getAirLine(), mp.getTcc(), mp.getEachAirlineProportion(), mp.getSpecialAirlineDays(),
+                    mp.getEachAirlineTime(), mp.getEachAirlineProportion(), mp.getIsEachAirlineInternational(), mp.getReversal(), mp.getRemarks(), mp.getPayTime(), mp.getOrganization(),
+                    mp.getDepartment(), mp.getErrorStatement()};
+            for (int i = 0; i < headers.length; i++) {
                 cellValue(cellStyle, row1, i, value[i]);
             }
             rowNum++;
+        }
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
+            sheet.setColumnWidth(i,sheet.getColumnWidth(i)*12/10);
         }
         response.setContentType("application/octet-stream");
         response.setHeader("Content-disposition", "attachment;filename=" + java.net.URLEncoder.encode(fileName, "UTF-8"));
@@ -559,7 +621,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
     }
 
     @Override
-    public void downloadFl(HttpServletResponse response) throws IOException{
+    public void downloadFl(HttpServletResponse response) throws IOException {
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("task");
         //设置宽度
@@ -607,16 +669,20 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             }
             StringBuilder eid = new StringBuilder(String.valueOf(mp.getEid()));
             int length = eid.length();
-            for(int i =0;i<10-length;i++)
+            for (int i = 0; i < 10 - length; i++)
                 eid.insert(0, "0");
-            String[] value = {eid.toString(),mp.getName(),mp.getDate(),mp.getTakeOffTime(),mp.getFlightNo(),mp.getAirplaneNumber(),mp.getType(),mp.getProperty(),mp.getPost(),mp.getIsNight(),
-                                mp.getIsInternational(),mp.getIsCost(),mp.getIsTake(),mp.getRealTime(),mp.getAirLine(),mp.getTcc(),mp.getEachAirlineProportion(),mp.getSpecialAirlineDays(),
-                                mp.getEachAirlineTime(),mp.getEachAirlineProportion(),mp.getIsEachAirlineInternational(),mp.getReversal(),mp.getRemarks(),mp.getPayTime(),mp.getOrganization(),
-                                mp.getDepartment(),mp.getErrorStatement()};
-            for(int i=0;i<headers.length;i++){
+            String[] value = {eid.toString(), mp.getName(), mp.getDate(), mp.getTakeOffTime(), mp.getFlightNo(), mp.getAirplaneNumber(), mp.getType(), mp.getProperty(), mp.getPost(), mp.getIsNight(),
+                    mp.getIsInternational(), mp.getIsCost(), mp.getIsTake(), mp.getRealTime(), mp.getAirLine(), mp.getTcc(), mp.getEachAirlineProportion(), mp.getSpecialAirlineDays(),
+                    mp.getEachAirlineTime(), mp.getEachAirlineProportion(), mp.getIsEachAirlineInternational(), mp.getReversal(), mp.getRemarks(), mp.getPayTime(), mp.getOrganization(),
+                    mp.getDepartment(), mp.getErrorStatement()};
+            for (int i = 0; i < headers.length; i++) {
                 cellValue(cellStyle, row1, i, value[i]);
             }
             rowNum++;
+        }
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
+            sheet.setColumnWidth(i,sheet.getColumnWidth(i)*12/10);
         }
         response.setContentType("application/octet-stream");
         response.setHeader("Content-disposition", "attachment;filename=" + java.net.URLEncoder.encode(fileName, "UTF-8"));
@@ -628,7 +694,13 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
         }
     }
 
-    private void cellValue(HSSFCellStyle cellStyle,HSSFRow row, int i ,String value) {
+    @Override
+    public String deleteProperty(@PathVariable String property){
+        doubleFlightRepository.deleteProperty(property);
+        return "redirect:/doubleFlight/property";
+    }
+
+    private void cellValue(HSSFCellStyle cellStyle, HSSFRow row, int i, String value) {
         Cell cell = row.createCell(i);
         cell.setCellStyle(cellStyle);
         cell.setCellValue(value);

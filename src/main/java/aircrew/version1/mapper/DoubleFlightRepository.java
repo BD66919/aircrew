@@ -3,6 +3,7 @@ package aircrew.version1.mapper;
 import aircrew.version1.entity.Air;
 import aircrew.version1.entity.DoubleFlight;
 import aircrew.version1.entity.Mp;
+import org.apache.ibatis.annotations.Insert;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -30,6 +31,19 @@ public interface DoubleFlightRepository extends JpaRepository<DoubleFlight,Integ
 
     @Query(value = "select mpConfirm from confirm ",nativeQuery =  true)
     String getMpConfirm();
+
+    @Query(value = "select property from property",nativeQuery = true)
+    List<String> propertiesList();
+
+    @Transactional
+    @Modifying
+    @Query(value = "delete from property where property = ?1",nativeQuery = true)
+    void deleteProperty(String property);
+
+    @Transactional
+    @Modifying
+    @Query(value = "INSERT INTO property(property) VALUES(?1)",nativeQuery = true)
+    void addProperty(String property);
 
     @Transactional
     @Modifying

@@ -6,29 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>soc修正闭环检查</title>
+    <title>双组航线查看</title>
     <link href="/aircrew/static/asserts/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
           rel="stylesheet">
     <link href="/aircrew/static/asserts/css/sb-admin-2.min.css" rel="stylesheet">
     <link href="/aircrew/static/asserts/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
-<style>
-    th {
-        font-size: 14px;
-    }
-
-    td {
-        font-size: 14px;
-    }
-</style>
 
 <body id="page-top" class="sidebar-toggled">
 <div id="wrapper">
     <div th:insert="commons/bar::sidebar"></div>
     <div id="content-wrapper" class="d-flex flex-column" style="position: relative;left: 100px;width: 93%;">
         <div id="content">
-            <nav class="navbar navbar-expand navbar-light bg-white topbar static-top shadow">
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-5 static-top shadow">
                 <div>
                     <div>
                         <h1 class="h3 text-gray-700 mb-4" style="margin-left:10px;margin-top: 30px;">飞行任务书审核辅助系统</h1>
@@ -38,53 +29,39 @@
                     <a style="display:block;position:absolute;right:1%;top:30%;color:grey" href="/aircrew/logout">退出</a>
                 </a>
             </nav>
-            <div class="container-fluid" style="background-color: white;margin-top: 10px;">
+            <div class="container-fluid">
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <a class="m-0 font-weight-bold text-muted" href="check.html"
-                           th:class="${activeUri}=='check'?'m-0 font-weight-bold text-primary':'m-0 font-weight-bold text-muted'">飞行闭环检查</a>
-                        <a class="m-0 font-weight-bold text-muted" href="check.html"
-                           th:class="${activeUri}=='socCheck'?'m-0 font-weight-bold text-primary':'m-0 font-weight-bold text-muted'">/SOC修正闭环检查</a>
+                        <h6 class="m-0 font-weight-bold text-primary">机组资质查看</h6>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                 <tr>
-                                    <th>日期</th>
-                                    <th>人员编号</th>
-                                    <th>姓名</th>
-                                    <th>航线</th>
-                                    <th>城市三字码</th>
-                                    <th>航班号</th>
-                                    <th>任务性质</th>
-                                    <!--                        <th>干部</th>-->
+                                    <th>双组航线</th>
+                                    <th>操作</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr th:each="pilot:${errorPilotInfo.list}">
-                                    <td th:text="${pilot.date}"></td>
-                                    <td th:text="${pilot.eid}"></td>
-                                    <td th:text="${pilot.name}"></td>
-                                    <td th:text="${pilot.airLine}"></td>
-                                    <td th:text="${pilot.tcc}"></td>
-                                    <td th:text="${pilot.flightNo}"></td>
-                                    <td th:text="${pilot.property}"></td>
-                                    <!--                        <td th:text="${pilot.cadre}"></td>-->
+                                <tr th:each="property:${propertiesList}">
+                                    <td th:text="${property}"></td>
+                                    <td>
+                                        <button th:attr="del_uri=@{/deleteProperty=}+${property}"
+                                                class="btn btn-sm btn-danger deleteBtn">删除
+                                        </button>
+                                    </td>
+                                    <form id="deletePropertyForm" method="post">
+                                        <input type="hidden" name="_method" value="delete"/>
+                                    </form>
                                 </tr>
                                 </tbody>
                             </table>
                         </div>
-
-                        <div style="text-align: center">
-                            共 <span th:text="${errorPilotInfo.total}"></span> 条记录
-                        </div>
-                        <div style="text-align: center">
-                            <span th:if="${msg} and ${msg2}" th:text="${msg}+${msg2}"></span>提醒：上月和下月无SOC数据无法修正
-                        </div>
                     </div>
                 </div>
             </div>
+
             <!-- /.container-fluid -->
             <!-- Bootstrap core JavaScript-->
             <script src="http://localhost:8088/aircrew/static/asserts/vendor/jquery/jquery.min.js"></script>
@@ -99,5 +76,15 @@
         </div>
     </div>
 </div>
+
 </body>
+
+<script>
+    $(".deleteBtn").click(function () {
+        if (confirm('确认删除?')) {
+            $("#deletePropertyForm").attr("action", $(this).attr("del_uri")).submit();
+        } else
+            return false;
+    })
+</script>
 </html>

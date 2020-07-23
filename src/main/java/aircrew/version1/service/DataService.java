@@ -25,6 +25,7 @@ public interface DataService {
     Map<String,Object> addNightFlight(HttpServletRequest request);
     Map<String,Object> addStageDoubleFlight(HttpServletRequest request);
 
+    Map<String,Object> deleteAll();
     Map<String,Object> deleteAir();
     Map<String,Object> deleteFl();
     Map<String,Object> deleteMp();
