@@ -6,10 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <link rel="icon" href="http://www.airchina.com.cn/favicon.ico" />
     <title>飞行任务书审核辅助系统</title>
     <link href="/aircrew/static/asserts/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-          rel="stylesheet">
+<!--    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"-->
+<!--          rel="stylesheet">-->
     <link href="/aircrew/static/asserts/css/sb-admin-2.min.css" rel="stylesheet">
     <link href="/aircrew/static/asserts/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
@@ -48,30 +49,10 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td th:text="${air}"></td>
-                                    <td th:text="${lastAirState}"></td>
-                                    <td th:text="${airCount}"></td>
-                                </tr>
-                                <tr>
-                                    <td th:text="${lastMp}"></td>
-                                    <td th:text="${lastLastMpState}"></td>
-                                    <td th:text="${lastMpCount}"></td>
-                                </tr>
-                                <tr>
-                                    <td th:text="${mp}"></td>
-                                    <td th:text="${lastMpState}"></td>
-                                    <td th:text="${mpCount}"></td>
-                                </tr>
-                                <tr>
-                                    <td th:text="${nextMp}"></td>
-                                    <td th:text="${nextLastMpState}"></td>
-                                    <td th:text="${nextMpCount}"></td>
-                                </tr>
-                                <tr>
-                                    <td th:text="${fl}"></td>
-                                    <td th:text="${lastFlState}"></td>
-                                    <td th:text="${flCount}"></td>
+                                <tr th:each="table:${tableList}">
+                                    <td th:text="${table.name}"></td>
+                                    <td th:text="${table.state}"></td>
+                                    <td th:text="${table.count}"></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -95,7 +76,7 @@
                         <li><a href="" data-toggle="modal" data-target="#addMp" class="dropdown-item">上传本月飞行小时费(人力)</a>
                         </li>
                         <li><a href="" data-toggle="modal" data-target="#addNextMp"
-                               class="dropdown-item">上传下月月飞行小时费(人力)</a></li>
+                               class="dropdown-item">上传下月飞行小时费(人力)</a></li>
                         <li><a href="" data-toggle="modal" data-target="#addFl" class="dropdown-item">上传本月生产台账(财务）</a>
                         </li>
                     </ul>
@@ -482,15 +463,15 @@
 </div>
 
 <!-- Bootstrap core JavaScript-->
-<script src="http://localhost:8088/aircrew/static/asserts/vendor/jquery/jquery.min.js"></script>
-<script src="http://localhost:8088/aircrew/static/asserts/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/static/asserts/vendor/jquery/jquery.min.js}"></script>
+<script th:src="@{/static/asserts/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
 
 <!-- Core plugin JavaScript-->
-<script src="http://localhost:8088/aircrew/static/asserts/vendor/jquery-easing/jquery.easing.min.js"></script>
+<script th:src="@{/static/asserts/vendor/jquery-easing/jquery.easing.min.js}"></script>
 
 <!-- Custom scripts for all pages-->
-<script src="http://localhost:8088/aircrew/static/asserts/js/sb-admin-2.min.js"></script>
-<script src="http://localhost:8088/aircrew/static/asserts/js/data.js"></script>
+<script th:src="@{/static/asserts/js/sb-admin-2.min.js}"></script>
+<script th:src="@{/static/asserts/js/data.js}"></script>
 </body>
 
 </html>

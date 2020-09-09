@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.*;
 
@@ -18,8 +19,14 @@ public class DoubleFlightController {
     DoubleFlightService doubleFlightService;
 
     @GetMapping(value = "/doubleFlight/flight")
-    public String flight(Model model, HttpServletRequest request) {
-       return doubleFlightService.flight(model, request);
+    public String flight(Model model, HttpServletRequest request, HttpSession session) {
+       return doubleFlightService.flight(model, request, session);
+    }
+
+    @PostMapping(value = "/doubleFlight/MtoJ")
+    @ResponseBody
+    public Map<String, Object> MtoJ(){
+        return doubleFlightService.MtoJ();
     }
 
     @GetMapping(value = "/doubleFlight/property")

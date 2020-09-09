@@ -11,21 +11,25 @@ import java.util.List;
 
 @Component
 public interface MpRepository extends JpaRepository<Mp,Integer> {
-
-    @Query(value = "select * from mp ORDER BY eid ,date ,takeOffTime;",nativeQuery = true)
+    @Query(value = "select * from mp ORDER BY eid ,date ,takeOffTime",nativeQuery = true)
     List<Mp> ByOrder();
 
-    @Query(value = "select * from last_mp ORDER BY eid ,date ,takeOffTime;",nativeQuery = true)
+    @Query(value = "select * from last_mp ORDER BY eid ,date ,takeOffTime",nativeQuery = true)
     List<Mp> LastByOrder();
 
-    @Query(value = "select * from next_mp ORDER BY eid ,date ,takeOffTime;",nativeQuery = true)
+    @Query(value = "select * from next_mp ORDER BY eid ,date ,takeOffTime",nativeQuery = true)
     List<Mp> NextByOrder();
 
-    @Query(value = "select * from mp WHERE eid=?1 ORDER BY date ,takeOffTime",nativeQuery = true)
+    @Query(value = "select * from mp WHERE eid=?1 ORDER BY date ,slideTime",nativeQuery = true)
     List<Mp> findByEid(int eid);
 
     @Query(value = "select * from mp WHERE property='调组乘机乘车' ",nativeQuery = true)
     List<Mp> findByProperty();
+
+    @Transactional
+    @Modifying
+    @Query(value = "update mp as m set m.post='J机长' where m.post='M见习机长' ",nativeQuery = true)
+    void MtoJ();
 
     @Transactional
     @Modifying

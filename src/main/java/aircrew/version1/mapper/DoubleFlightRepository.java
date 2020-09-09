@@ -1,9 +1,6 @@
 package aircrew.version1.mapper;
 
-import aircrew.version1.entity.Air;
 import aircrew.version1.entity.DoubleFlight;
-import aircrew.version1.entity.Mp;
-import org.apache.ibatis.annotations.Insert;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -34,6 +31,16 @@ public interface DoubleFlightRepository extends JpaRepository<DoubleFlight,Integ
 
     @Query(value = "select property from property",nativeQuery = true)
     List<String> propertiesList();
+
+    @Transactional
+    @Modifying
+    @Query(value = "update doubleFlight as d set d.firstQualification='J机长(原为M见习机长)' where d.firstQualification='M见习机长' ",nativeQuery = true)
+    void firstMtoJ();
+
+    @Transactional
+    @Modifying
+    @Query(value = "update doubleFlight as d set d.secondQualification='J机长(原为M见习机长)' where d.secondQualification='M见习机长' ",nativeQuery = true)
+    void secondMtoJ();
 
     @Transactional
     @Modifying

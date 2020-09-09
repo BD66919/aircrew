@@ -1,14 +1,11 @@
 package aircrew.version1.mapper;
 
 import aircrew.version1.entity.Fl;
-import aircrew.version1.entity.Mp;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Component
 public interface FlRepository extends JpaRepository<Fl,Integer> {

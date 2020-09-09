@@ -12,6 +12,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.util.Enumeration;
 import java.util.Map;
 
@@ -39,6 +41,18 @@ public class LoginController {
         this.dataService = dataService;
     }
 
+    //生成32位小写MD5字符串
+    private static String getMD5String(String str) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(str.getBytes());
+            return new BigInteger(1, md.digest()).toString(16);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @RequestMapping(value="/userLogin",method= RequestMethod.POST)
     public String userLogin(@RequestParam("loginName") String loginName,
                             @RequestParam("loginPwd") String loginPwd,
@@ -46,6 +60,8 @@ public class LoginController {
                             Model model,
                             HttpSession session){
         Subject subject = SecurityUtils.getSubject();
+        loginPwd = getMD5String(loginPwd);
+        System.out.println(loginPwd);
         UsernamePasswordToken token = new UsernamePasswordToken(loginName,loginPwd);
         String userName = userRepository.getUserName(loginName);
         String department = userRepository.getDepartment(loginName);
@@ -53,7 +69,7 @@ public class LoginController {
             subject.login(token);
             session.setAttribute("userName",userName);
             session.setAttribute("department",department);
-            model.addAllAttributes(dataService.login());
+            model.addAllAttributes(dataService.login(session));
             return "data/data.html";
         }catch(UnknownAccountException e){
             map.put("message","用户名错误");

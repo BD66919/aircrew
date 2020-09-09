@@ -4,6 +4,7 @@ import aircrew.version1.entity.*;
 import aircrew.version1.mapper.*;
 import aircrew.version1.service.DataService;
 import aircrew.version1.utils.*;
+import com.github.pagehelper.PageException;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,6 +12,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +27,6 @@ import java.util.Map;
  */
 @Controller
 public class DataController {
-//    @Autowired
-//    PilotRepository pilotRepository;
 
     @Autowired
     AirRepository airRepository;
@@ -48,8 +51,8 @@ public class DataController {
      * 跳转至pilot主页面
      */
     @GetMapping("/data/data")
-    public String data(Model model){
-        model.addAllAttributes(dataService.login());
+    public String data(Model model, HttpSession session){
+        model.addAllAttributes(dataService.login(session));
         return "data/data.html";
     }
 
@@ -209,18 +212,29 @@ public class DataController {
      * 实现财务飞行数据比较
      */
     @GetMapping("/data/compareFlAir")
-    public String compareFlAir(Model model){
+    public String compareFlAir(Model model) throws ParseException {
        model.addAttribute("airList",dataService.compareFlAir());
-        return "/data/compareFlAir.html";
+        return "data/compareFlAir.html";
+    }
+
+    @GetMapping("/data/flAirExcelDownload")
+    public void flAirExcelDownload(HttpServletResponse response) throws IOException, ParseException {
+        dataService.flAirExcelDownload(response);
+
     }
 
     /**
      * 实现飞行人力数据比较
      */
     @GetMapping("/data/compareAirMp")
-    public String compareAirMp(Model model){
-        model.addAttribute("mpList",dataService.compareAirMp());
-        return "/data/compareAirMp.html";
+    public String compareAirMp(Model model) throws ParseException {
+        return dataService.compareAirMp(model);
+    }
+
+    @GetMapping("/data/airMpExcelDownload")
+    public void airMpExcelDownload(HttpServletResponse response) throws IOException, ParseException {
+        dataService.airMpExcelDownload(response);
+
     }
 
 }

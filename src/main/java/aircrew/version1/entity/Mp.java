@@ -1,7 +1,6 @@
 package aircrew.version1.entity;
 
 import lombok.Data;
-
 import javax.persistence.*;
 
 @Entity

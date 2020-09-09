@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <link rel="icon" href="http://www.airchina.com.cn/favicon.ico" />
     <title>飞行与人力数据对比</title>
     <link href="/aircrew/static/asserts/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
@@ -49,41 +50,38 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr th:each="mp:${mpList}">
-<!--                                    <td style="width: 50px;" th:text="${mp.date}"></td>-->
-<!--                                    <td style="width: 50px;" th:text="${mp.flightNo}"></td>-->
-<!--                                    <td style="width: 200px;" th:text="${mp.tcc}"></td>-->
-<!--&lt;!&ndash;                                    <td style="width: 200px;" th:text="${mp.takeOffTime}"></td>&ndash;&gt;-->
-<!--                                    <td style="width: 50px;" th:text="${mp.eid}"></td>-->
-<!--                                    <td style="width: 50px;" th:text="${mp.name}"></td>-->
-<!--                                    <td style="width: 100px;" th:text="${mp.post}"></td>-->
-<!--                                    <td style="width: 50px;" th:text="${mp.property}"></td>-->
+                                <tr th:each="mp:${mpResultList}">
                                     <td th:text="${mp.date}"></td>
                                     <td th:text="${mp.flightNo}"></td>
                                     <td th:text="${mp.tcc}"></td>
-                                    <!--                                    <td style="width: 200px;" th:text="${mp.takeOffTime}"></td>-->
                                     <td th:text="${mp.eid}"></td>
                                     <td th:text="${mp.name}"></td>
                                     <td th:text="${mp.post}"></td>
-<!--                                    <td th:text="${mp.property}"></td>-->
                                 </tr>
                                 </tbody>
                             </table>
+                            <div>
+                                飞行数据航班总量:<span th:text="${airCount}"></span>&nbsp;
+                                人力数据航班总量:<span th:text="${mpCount}"></span>
+                            </div>
+                            <div>
+                                <a href="/aircrew/data/airMpExcelDownload" type="button" class="btn btn-primary">下载飞行与人力对比数据</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- /.container-fluid -->
             <!-- Bootstrap core JavaScript-->
-            <script src="http://localhost:8088/aircrew/static/asserts/vendor/jquery/jquery.min.js"></script>
-            <script src="http://localhost:8088/aircrew/static/asserts/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+            <script th:src="@{/static/asserts/vendor/jquery/jquery.min.js}"></script>
+            <script th:src="@{/static/asserts/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
 
             <!-- Core plugin JavaScript-->
-            <script src="http://localhost:8088/aircrew/static/asserts/vendor/jquery-easing/jquery.easing.min.js"></script>
+            <script th:src="@{/static/asserts/vendor/jquery-easing/jquery.easing.min.js}"></script>
 
             <!-- Custom scripts for all pages-->
-            <script src="http://localhost:8088/aircrew/static/asserts/js/sb-admin-2.min.js"></script>
-            <script src="http://localhost:8088/aircrew/static/asserts/js/data.js"></script>
+            <script th:src="@{/static/asserts/js/sb-admin-2.min.js}"></script>
+            <script th:src="@{/static/asserts/js/data.js}"></script>
         </div>
     </div>
 </div>

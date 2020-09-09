@@ -12,7 +12,6 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
@@ -33,6 +32,7 @@ public class CheckServiceImpl implements CheckService {
 
     @Override
     public String check(Model model) {
+
         List<Mp> lastMpList = mpRepository.LastByOrder();
         List<Mp> nextMpList = mpRepository.NextByOrder();
         if (lastMpList.isEmpty())
@@ -42,7 +42,7 @@ public class CheckServiceImpl implements CheckService {
         List<Mp> errorPilotList = getCheckResult();
         PageInfo<Mp> errorPilotInfo = new PageInfo<Mp>(errorPilotList);
         model.addAttribute("errorPilotInfo", errorPilotInfo);
-        return "/check/check.html";
+        return "check/check.html";
     }
 
     @Override
@@ -74,7 +74,6 @@ public class CheckServiceImpl implements CheckService {
         for (Mp mp : errorPilotList) {
             //设置居中
             HSSFRow row1 = sheet.createRow(rowNum);
-
             String[] value = {mp.getDate(), String.valueOf(mp.getEid()),mp.getName(),mp.getTcc(),mp.getFlightNo(),mp.getProperty()};
             for (int i = 0; i < headers.length; i++) {
                 cellValue(cellStyle, row1, i, value[i]);
@@ -111,6 +110,7 @@ public class CheckServiceImpl implements CheckService {
             pilotListByOrder.add(mp);
 
         }
+
         List<Mp> lastMpList = mpRepository.LastByOrder();
         List<Mp> nextMpList = mpRepository.NextByOrder();
         List<Mp> lastOneMpList = new ArrayList<>();

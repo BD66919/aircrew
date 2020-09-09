@@ -97,7 +97,6 @@ public class AirExcelUtils {
                             continue;
                         if (j == 0) {
                             SocExcel.setTakeOffTime(cellData.split(" ")[1]);
-                            SocExcel.setDate(cellData.split(" ")[0].replace("/","-"));
                         }else if (j == 1) {
                             SocExcel.setFlightNo(cellData);
                         }else if (j == 2) {
@@ -108,6 +107,7 @@ public class AirExcelUtils {
                             SocExcel.setDep(cellData);
                         }else if (j == 5) {
                             SocExcel.setSlideTime(cellData.split(" ")[1]);
+                            SocExcel.setDate(cellData.split(" ")[0].replace("/","-"));
                         }else if (j == 6) {
                             SocExcel.setArr(cellData);
                         }else if (j == 7) {
@@ -135,4 +135,17 @@ public class AirExcelUtils {
         }
         return excelList;
     }
+
+//    static String getNumeric(String str) {
+//        str=str.trim();
+//        String str2="";
+//        if(str != null && !"".equals(str)){
+//            for(int i=0;i<str.length();i++  ){
+//                if(str.charAt(i)>=48 && str.charAt(i)<=57){
+//                    str2 =str2 + str.charAt(i);
+//                }
+//            }
+//        }
+//        return str2;
+//    }
 }

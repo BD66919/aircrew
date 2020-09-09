@@ -1,40 +1,23 @@
 package aircrew.version1.controller;
-
 import java.util.Arrays;
-
 import java.util.Enumeration;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.aspectj.lang.JoinPoint;
-
 import org.aspectj.lang.annotation.AfterReturning;
-
 import org.aspectj.lang.annotation.Aspect;
-
 import org.aspectj.lang.annotation.Before;
-
 import org.aspectj.lang.annotation.Pointcut;
-
 import org.slf4j.Logger;
-
 import org.slf4j.LoggerFactory;
-
 import org.springframework.core.annotation.Order;
-
 import org.springframework.stereotype.Component;
-
 import org.springframework.web.context.request.RequestContextHolder;
-
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-
-
 /**
 
  * 实现Web层的日志切面
 
- * @author Angel(QQ:412887952)
+ * @author
 
  * @version v.0.1
 
@@ -49,8 +32,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class WebLogAspect {
 
     private Logger logger =  LoggerFactory.getLogger(this.getClass());
-
-
 
     /**
 
@@ -77,13 +58,8 @@ public class WebLogAspect {
     @Pointcut("execution(public * aircrew.version1.controller..*.*(..))")
     public void webLog(){}
 
-
-
     @Before("webLog()")
     public void doBefore(JoinPoint joinPoint){
-
-
-
         // 接收到请求，记录请求内容
         logger.info("WebLogAspect.doBefore()");
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -109,10 +85,11 @@ public class WebLogAspect {
 
             String paraName=(String)enu.nextElement();
 
-            System.out.println(paraName+": "+request.getParameter(paraName));
+            logger.info("操作信息"+paraName+": "+request.getParameter(paraName));
+
+//            System.out.println(paraName+": "+request.getParameter(paraName));
 
         }
-
     }
 
     @AfterReturning("webLog()")
@@ -120,7 +97,4 @@ public class WebLogAspect {
         // 处理完请求，返回内容
         logger.info("WebLogAspect.doAfterReturning()");
     }
-
-
-
 }

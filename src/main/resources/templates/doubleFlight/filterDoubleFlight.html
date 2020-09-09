@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <link rel="icon" href="http://www.airchina.com.cn/favicon.ico" />
     <title>双组航线查看</title>
     <link href="/aircrew/static/asserts/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
@@ -155,7 +156,7 @@
                     <input type="text" class="form-control" id="firstPosition" name="firstPosition"/>
                 </div>
                 <div class="form-group">
-                    <label for="firstQualification">资质1</label>
+                    <label for="firstQualification">资质1(若资质为空，请在主页面添加当前机组资质即可）</label>
                     <br>
                     <select class="form-control" id="firstQualification">
                         <option th:each="result:${propertiesList}" th:text="${result}"></option>
@@ -166,7 +167,7 @@
                     <input type="text" class="form-control" id="secondPosition" name="secondPosition"/>
                 </div>
                 <div class="form-group">
-                    <label for="secondQualification">资质2</label>
+                    <label for="secondQualification">资质2(若资质为空，请在主页面添加当前机组资质即可）</label>
                     <br>
                     <select class="form-control" id="secondQualification">
                         <option th:each="result:${propertiesList}" th:text="${result}"></option>
@@ -223,11 +224,17 @@
     </div>
 </div>
 </body>
-<script src="http://localhost:8088/aircrew/static/asserts/vendor/jquery/jquery.min.js"></script>
-<script src="http://localhost:8088/aircrew/static/asserts/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="http://localhost:8088/aircrew/static/asserts/vendor/jquery-easing/jquery.easing.min.js"></script>
-<script src="http://localhost:8088/aircrew/static/asserts/js/sb-admin-2.min.js"></script>
-<script src="http://localhost:8088/aircrew/static/asserts/js/data.js"></script>
+<!-- /.container-fluid -->
+<!-- Bootstrap core JavaScript-->
+<script th:src="@{/static/asserts/vendor/jquery/jquery.min.js}"></script>
+<script th:src="@{/static/asserts/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+<!-- Core plugin JavaScript-->
+<script th:src="@{/static/asserts/vendor/jquery-easing/jquery.easing.min.js}"></script>
+
+<!-- Custom scripts for all pages-->
+<script th:src="@{/static/asserts/js/sb-admin-2.min.js}"></script>
+<script th:src="@{/static/asserts/js/data.js}"></script>
 <script>
     $('#edit').on("show.bs.modal", function (e) {
         var id = $(e.relatedTarget).data("id");

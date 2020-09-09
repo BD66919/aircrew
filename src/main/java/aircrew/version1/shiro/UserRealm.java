@@ -18,6 +18,14 @@ public class UserRealm extends AuthorizingRealm{
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection arg0) {
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+        if(arg0.getPrimaryPrincipal().equals("系统管理员")){
+            info.addStringPermission("user:data");
+            info.addStringPermission("user:update");
+            info.addStringPermission("user:check");
+            info.addStringPermission("user:fl");
+            info.addStringPermission("user:air");
+            info.addStringPermission("user:mp");
+        }
         if(arg0.getPrimaryPrincipal().equals("财务")) {
             info.addStringPermission("user:data");
             info.addStringPermission("user:check");
