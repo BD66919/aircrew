@@ -12,63 +12,84 @@ public class DoubleFlight {
     private int id;
 
     @Column
-    private  String date;
+    private String date;
 
     @Column
-    private  String no;
+    private String no;
 
     @Column
-    private  String line;
+    private String line;
 
     @Column
-    private  String tcc;
+    private String tcc;
 
     @Column
-    private  String firstPosition;
+    private String firstPosition;
 
     @Column
-    private  String firstQualification;
+    private String firstQualification;
 
     @Column
-    private  String secondPosition;
+    private String secondPosition;
 
     @Column
-    private  String secondQualification;
+    private String secondQualification;
 
     @Column
-    private  String flightCombine;
+    private String thirdPosition;
 
     @Column
-    private  String doubleLine;
+    private String thirdQualification;
 
     @Column
-    private  String nightFlight;
+    private String fourthPosition;
 
     @Column
-    private  String stageDoubleFlight;
+    private String fourthQualification;
 
     @Column
-    private  String flightCheck;
+    private String fifthPosition;
 
     @Column
-    private  String cadre;
+    private String fifthQualification;
 
     @Column
-    private  String airChangeRecord;
+    private String flightCombine;
 
     @Column
-    private  String mpChangeRecord;
+    private String doubleLine;
 
     @Column
-    private  String airRemark;
+    private String nightFlight;
 
     @Column
-    private  String mpRemark;
+    private String stageDoubleFlight;
+
+    @Column
+    private String flightCheck;
+
+    @Column
+    private String cadre;
+
+    @Column
+    private String airChangeRecord;
+
+    @Column
+    private String mpChangeRecord;
+
+    @Column
+    private String airRemark;
+
+    @Column
+    private String mpRemark;
 
     @Column
     private Boolean isFlag;
 
-    public DoubleFlight(){
+    @Column
+    private Boolean isMore;
+
+    public DoubleFlight() {
 
     }
 

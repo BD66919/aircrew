@@ -93,8 +93,14 @@ public class LastMp {
     private String errorStatement;
 
     public LastMp(){
-
     }
 
-
+    public LastMp(String date,int eid,String name,String tcc,String flightNo,String property){
+        this.date = date;
+        this.eid = eid;
+        this.name = name;
+        this.tcc = tcc;
+        this.flightNo = flightNo;
+        this.property = property;
+    }
 }

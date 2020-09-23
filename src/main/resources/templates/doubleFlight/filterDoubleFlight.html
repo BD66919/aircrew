@@ -214,7 +214,6 @@
                     <label for="remarks">修改说明</label>
                     <input type="text" class="form-control" id="remarks" name="remarks"/>
                 </div>
-
                 <span id="doubleFlightStatus" style="color: red"></span>
                 <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
                 <button type="submit" class="btn btn-success" id="updateFilterDoubleFlightSubmit"
@@ -224,9 +223,11 @@
     </div>
 </div>
 </body>
+
 <!-- /.container-fluid -->
 <!-- Bootstrap core JavaScript-->
 <script th:src="@{/static/asserts/vendor/jquery/jquery.min.js}"></script>
+
 <script th:src="@{/static/asserts/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
 
 <!-- Core plugin JavaScript-->
@@ -234,7 +235,9 @@
 
 <!-- Custom scripts for all pages-->
 <script th:src="@{/static/asserts/js/sb-admin-2.min.js}"></script>
+
 <script th:src="@{/static/asserts/js/data.js}"></script>
+
 <script>
     $('#edit').on("show.bs.modal", function (e) {
         var id = $(e.relatedTarget).data("id");
@@ -338,4 +341,5 @@
         }
     }
 </script>
+
 </html>

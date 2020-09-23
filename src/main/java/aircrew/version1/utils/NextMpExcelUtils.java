@@ -1,15 +1,13 @@
 package aircrew.version1.utils;
 
-import aircrew.version1.entity.LastMp;
 import aircrew.version1.entity.NextMp;
 import org.apache.poi.ss.usermodel.*;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class NextMpExcelUtils {
-    public static List<NextMp> addNextMp(InputStream inputStream) {
+    public static List<NextMp> addNextMpExcel(InputStream inputStream) {
         List<NextMp> excelList = new ArrayList<>();
         Workbook workbook ;
         try {

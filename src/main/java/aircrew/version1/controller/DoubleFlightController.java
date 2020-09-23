@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -15,8 +14,12 @@ import java.util.*;
 @Controller
 public class DoubleFlightController {
 
+    private final DoubleFlightService doubleFlightService;
+
     @Autowired
-    DoubleFlightService doubleFlightService;
+    public DoubleFlightController(DoubleFlightService doubleFlightService){
+        this.doubleFlightService = doubleFlightService;
+    }
 
     @GetMapping(value = "/doubleFlight/flight")
     public String flight(Model model, HttpServletRequest request, HttpSession session) {
@@ -49,6 +52,11 @@ public class DoubleFlightController {
         return doubleFlightService.doubleFlight(model);
     }
 
+    @GetMapping(value = "/doubleFlight/moreDoubleFlight")
+    public String moreDoubleFlight(Model model) {
+        return doubleFlightService.moreDoubleFlight(model);
+    }
+
     @GetMapping(value = "/doubleFlight/filterDoubleFlight")
     public String filterDoubleFlight(Model model) {
         return doubleFlightService.filterDoubleFlight(model);
@@ -58,6 +66,12 @@ public class DoubleFlightController {
     @ResponseBody
     public Map<String, Object> updateDoubleFlight(HttpServletRequest request) {
         return doubleFlightService.updateDoubleFlight(request);
+    }
+
+    @PostMapping(value = "/doubleFlight/updateMoreDoubleFlight")
+    @ResponseBody
+    public Map<String, Object> updateMoreDoubleFlight(HttpServletRequest request) {
+        return doubleFlightService.updateMoreDoubleFlight(request);
     }
 
     @PostMapping(value = "/doubleFlight/updateFilterDoubleFlight")
@@ -87,6 +101,11 @@ public class DoubleFlightController {
     @RequestMapping(value = "/doubleFlight/downloadDoubleFlight", method = RequestMethod.GET)
     public void downloadDoubleFlight(HttpServletResponse response) throws IOException {
         doubleFlightService.downloadDoubleFlight(response);
+    }
+
+    @RequestMapping(value = "/doubleFlight/downloadMoreDoubleFlight", method = RequestMethod.GET)
+    public void downloadMoreDoubleFlight(HttpServletResponse response) throws IOException {
+        doubleFlightService.downloadMoreDoubleFlight(response);
     }
 
     @RequestMapping(value = "/doubleFlight/downloadFlMtoJ", method = RequestMethod.GET)

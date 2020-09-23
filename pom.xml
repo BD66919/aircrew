@@ -18,10 +18,8 @@
 
     <properties>
         <java.version>1.8</java.version>
-
         <!-- 跳过测试 -->
         <skipTests>true</skipTests>
-
     </properties>
 
     <!--引入项目依赖    -->
@@ -139,12 +137,12 @@
             <version>1.18.12</version>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            &lt;!&ndash;Spring 官方提供的热部署插件 &ndash;&gt;-->
-        <!--            <groupId>org.springframework.boot</groupId>-->
-        <!--            <artifactId>spring-boot-devtools</artifactId>-->
-        <!--            <optional>true</optional>-->
-        <!--        </dependency>-->
+        <dependency>
+            <!--Spring 官方提供的热部署插件 -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!-- shiro依赖-->
         <dependency>
@@ -163,6 +161,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
         </dependency>
 
     </dependencies>

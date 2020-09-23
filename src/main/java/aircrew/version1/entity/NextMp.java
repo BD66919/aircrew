@@ -1,7 +1,6 @@
 package aircrew.version1.entity;
 
 import lombok.Data;
-
 import javax.persistence.*;
 
 @Entity
@@ -94,8 +93,14 @@ public class NextMp {
     private String errorStatement;
 
     public NextMp(){
-
     }
 
-
+    public NextMp(String date,int eid,String name,String tcc,String flightNo,String property){
+        this.date = date;
+        this.eid = eid;
+        this.name = name;
+        this.tcc = tcc;
+        this.flightNo = flightNo;
+        this.property = property;
+    }
 }

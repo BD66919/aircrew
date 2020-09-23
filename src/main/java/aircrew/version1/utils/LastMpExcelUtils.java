@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LastMpExcelUtils {
-    public static List<LastMp> addLastMp(InputStream inputStream) {
+    public static List<LastMp> addLastMpExcel(InputStream inputStream) {
         List<LastMp> excelList = new ArrayList<>();
         Workbook workbook ;
         try {

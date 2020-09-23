@@ -11,8 +11,14 @@ import java.io.IOException;
 
 @Controller
 public class CheckController {
+
+
+    private final CheckService checkService;
+
     @Autowired
-    CheckService checkService;
+    public CheckController(CheckService checkService){
+        this.checkService = checkService;
+    }
 
     /**
      *

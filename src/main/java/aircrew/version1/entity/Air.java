@@ -62,5 +62,45 @@ public class Air {
 
     public Air() {
     }
+
+    public Air(LastAir lastAir) {
+        this.id = lastAir.getId();
+        this.date = lastAir.getDate();
+        this.flightNo = lastAir.getFlightNo();
+        this.type = lastAir.getType();
+        this.flightNumber = lastAir.getFlightNumber();
+        this.dep = lastAir.getDep();
+        this.slideTime = lastAir.getSlideTime();
+        this.takeOffTime = lastAir.getTakeOffTime();
+        this.arr = lastAir.getArr();
+        this.landTime = lastAir.getLandTime();
+        this.inPlaceTime = lastAir.getInPlaceTime();
+        this.property = lastAir.getProperty();
+        this.eid = lastAir.getEid();
+        this.name = lastAir.getName();
+        this.position = lastAir.getPosition();
+        this.qualify = lastAir.getQualify();
+        this.statement = lastAir.getStatement();
+    }
+
+    public Air(NextAir nextAir) {
+        this.id = nextAir.getId();
+        this.date = nextAir.getDate();
+        this.flightNo = nextAir.getFlightNo();
+        this.type = nextAir.getType();
+        this.flightNumber = nextAir.getFlightNumber();
+        this.dep = nextAir.getDep();
+        this.slideTime = nextAir.getSlideTime();
+        this.takeOffTime = nextAir.getTakeOffTime();
+        this.arr = nextAir.getArr();
+        this.landTime = nextAir.getLandTime();
+        this.inPlaceTime = nextAir.getInPlaceTime();
+        this.property = nextAir.getProperty();
+        this.eid = nextAir.getEid();
+        this.name = nextAir.getName();
+        this.position = nextAir.getPosition();
+        this.qualify = nextAir.getQualify();
+        this.statement = nextAir.getStatement();
+    }
 }
 

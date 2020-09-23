@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -33,9 +34,11 @@ class Table {
 public class DataServiceImpl implements DataService {
 
     private final FlRepository flRepository;
+    private final LastAirRepository lastAirRepository;
     private final AirRepository airRepository;
-    private final MpRepository mpRepository;
+    private final NextAirRepository nextAirRepository;
     private final LastMpRepository lastMpRepository;
+    private final MpRepository mpRepository;
     private final NextMpRepository nextMpRepository;
     private final AirlineRepository airlineRepository;
     private final CadreRepository cadreRepository;
@@ -43,10 +46,12 @@ public class DataServiceImpl implements DataService {
     private final NightFlightRepository nightFlightRepository;
 
     @Autowired
-    DataServiceImpl(FlRepository flRepository, MpRepository mpRepository, AirRepository airRepository, LastMpRepository lastMpRepository, NextMpRepository nextMpRepository, AirlineRepository airlineRepository, AirlineRepository airlineRepository1, CadreRepository cadreRepository, StageDoubleFlightRepository stageDoubleFlightRepository, NightFlightRepository nightFlightRepository) {
+    DataServiceImpl(FlRepository flRepository, MpRepository mpRepository, AirRepository airRepository, AirlineRepository airlineRepository, LastAirRepository lastAirRepository, NextAirRepository nextAirRepository, LastMpRepository lastMpRepository, NextMpRepository nextMpRepository, AirlineRepository airlineRepository1, CadreRepository cadreRepository, StageDoubleFlightRepository stageDoubleFlightRepository, NightFlightRepository nightFlightRepository) {
         this.flRepository = flRepository;
         this.mpRepository = mpRepository;
         this.airRepository = airRepository;
+        this.lastAirRepository = lastAirRepository;
+        this.nextAirRepository = nextAirRepository;
         this.lastMpRepository = lastMpRepository;
         this.nextMpRepository = nextMpRepository;
         this.airlineRepository = airlineRepository1;
@@ -54,19 +59,6 @@ public class DataServiceImpl implements DataService {
         this.stageDoubleFlightRepository = stageDoubleFlightRepository;
         this.nightFlightRepository = nightFlightRepository;
     }
-
-//    static String getNumeric(String str) {
-//        str=str.trim();
-//        String str2="";
-//        if(!"".equals(str)){
-//            for(int i=0;i<str.length();i++  ){
-//                if((str.charAt(i)>=48 && str.charAt(i)<=57) || str.charAt(i) ==47 ){
-//                    str2 =str2 + str.charAt(i);
-//                }
-//            }
-//        }
-//        return str2;
-//    }
 
     private static boolean isNumeric(String str) {
         for (int i = 0; i < str.length(); i++) {
@@ -253,12 +245,13 @@ public class DataServiceImpl implements DataService {
         return airResultList;
     }
 
-    HashMap<String,Object> getAirMpCompareList() throws ParseException {
-        List<Air> airList = airRepository.findAllBySort();
+    HashMap<String, Object> getAirMpCompareList() throws ParseException {
+        List<Air> airList = airRepository.getByDateSlideTimeEidSort();
         List<Mp> mpList = mpRepository.findAll();
         List<Mp> mpResultList = new ArrayList<>();
         long airCount = airRepository.count();
         int mpCount = 0;
+
         //逐一选择每一行的人力数据
         for (Mp mp : mpList) {
             //人力中航线为该飞行完整任务航线，需要划分
@@ -320,6 +313,7 @@ public class DataServiceImpl implements DataService {
                     }
                 }
             }
+
             //结果的航线中可能存在重复的出发地/到达地，需要去除
             String[] tcc = airLine.toString().split("-");
             StringBuilder tccAmend = new StringBuilder();
@@ -344,8 +338,10 @@ public class DataServiceImpl implements DataService {
                 }
             } else
                 result.setTcc(mp.getTcc());
+
             if (flag)
                 mpResultList.add(result);
+
             if (!isAppear) {
                 result.setDate(mp.getDate());
                 result.setFlightNo(mp.getFlightNo());
@@ -355,8 +351,10 @@ public class DataServiceImpl implements DataService {
                 result.setPost(qualify);
                 mpResultList.add(result);
             }
+
         }
 
+        //逐一选择航后数据
         for (Air air : airList) {
             if (air.getFlightNo().substring(0, 1).equals("0"))
                 continue;
@@ -401,7 +399,6 @@ public class DataServiceImpl implements DataService {
             //获取上月天数
             calendar.setTime(simpleDateFormat.parse(mpResultList.get(0).getDate().substring(0, 5) + "0" + String.valueOf(Integer.parseInt(mpResultList.get(0).getDate().substring(5, 7)) - 1) + "-01"));
             daysOfLastMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-
         }
 
         //结果矫正
@@ -413,6 +410,7 @@ public class DataServiceImpl implements DataService {
             String flightNumber = mp.getAirplaneNumber().replace("-", "");
             String airTcc = mp.getTcc().split(" ")[0];
             String mpTcc = mp.getTcc().split(" ")[1];
+
             if (airTcc.length() != mpTcc.length()) {
                 String[] flightNoArray = mp.getFlightNo().split("/");
                 String airTccCheck = null;
@@ -443,11 +441,20 @@ public class DataServiceImpl implements DataService {
                     } else
                         yesterday = yesterday.substring(0, 8) + String.valueOf(day);
 
-                    List<Air> yesterdayAirCheckList = airRepository.getAirCheck(yesterday, flightNo, mp.getEid(), flightNumber);
-                    if (yesterdayAirCheckList.isEmpty())
-                        yesterdayAirCheckList = airRepository.getAirCheck(yesterday, flightNo, mp.getEid(), "B" + flightNumber);
+                    List<Air> yesterdayAirCheckList = airRepository.findByDateAndFlightNoAndEidAndFlightNumberOrderBySlideTime(yesterday, flightNo, mp.getEid(), flightNumber);
+                    if (yesterdayAirCheckList.isEmpty()) {
+                        yesterdayAirCheckList = airRepository.findByDateAndFlightNoAndEidAndFlightNumberOrderBySlideTime(yesterday, flightNo, mp.getEid(), "B" + flightNumber);
+                        if(yesterdayAirCheckList.isEmpty())
+                            yesterdayAirCheckList = airRepository.findByDateAndEidLikeFlightNoOrderBySlideTime(yesterday,mp.getEid(),flightNo);
+                    }
 
-                    List<Air> todayAirCheckList = airRepository.getAirCheck(mp.getDate(),flightNo,mp.getEid(),flightNumber);
+                    //今天
+                    List<Air> todayAirCheckList = airRepository.findByDateAndFlightNoAndEidAndFlightNumberOrderBySlideTime(mp.getDate(), flightNo, mp.getEid(), flightNumber);
+                    if(todayAirCheckList.isEmpty()){
+                        todayAirCheckList = airRepository.findByDateAndFlightNoAndEidAndFlightNumberOrderBySlideTime(mp.getDate(),flightNo,mp.getEid(),"B" + flightNumber);
+                        if(todayAirCheckList.isEmpty())
+                            todayAirCheckList = airRepository.findByDateAndEidLikeFlightNoOrderBySlideTime(mp.getDate(),mp.getEid(),flightNo);
+                    }
 
                     //后一天
                     String tomorrow = mp.getDate();
@@ -469,10 +476,12 @@ public class DataServiceImpl implements DataService {
                     } else
                         tomorrow = tomorrow.substring(0, 8) + String.valueOf(day);
 
-                    List<Air> tomorrowAirCheckList = airRepository.getAirCheck(tomorrow, flightNo, mp.getEid(), flightNumber);
-                    if (tomorrowAirCheckList.isEmpty())
-                        tomorrowAirCheckList = airRepository.getAirCheck(tomorrow, flightNo, mp.getEid(), "B" + flightNumber);
-
+                    List<Air> tomorrowAirCheckList = airRepository.findByDateAndFlightNoAndEidAndFlightNumberOrderBySlideTime(tomorrow, flightNo, mp.getEid(), flightNumber);
+                    if (tomorrowAirCheckList.isEmpty()) {
+                        tomorrowAirCheckList = airRepository.findByDateAndFlightNoAndEidAndFlightNumberOrderBySlideTime(tomorrow, flightNo, mp.getEid(), "B" + flightNumber);
+                        if(tomorrowAirCheckList.isEmpty())
+                            tomorrowAirCheckList = airRepository.findByDateAndEidLikeFlightNoOrderBySlideTime(tomorrow,mp.getEid(),flightNo);
+                    }
                     for (Air air : yesterdayAirCheckList) {
                         if (airTccCheck == null) {
                             airTccCheck = air.getDep() + ("-") + air.getArr();
@@ -480,7 +489,7 @@ public class DataServiceImpl implements DataService {
                             airTccCheck = air.getDep() + ("-") + airTccCheck;
                     }
 
-                    for(Air air : todayAirCheckList){
+                    for (Air air : todayAirCheckList) {
                         if (airTccCheck == null) {
                             airTccCheck = air.getDep() + ("-") + air.getArr();
                         } else
@@ -495,6 +504,7 @@ public class DataServiceImpl implements DataService {
                     }
                     firstFlightNo = flightNo;
                 }
+
                 if (airTccCheck != null)
                     //相同就去除
                     if (airTccCheck.equals(mpTcc.substring(3))) {
@@ -503,11 +513,13 @@ public class DataServiceImpl implements DataService {
                     } else
                         mp.setTcc("飞行：" + airTccCheck + " 人力：" + mpTcc.substring(3));
             }
+
         }
-        HashMap<String,Object> map = new HashMap<>();
-        map.put("airCount",airCount);
-        map.put("mpCount",mpCount);
-        map.put("mpResultList",mpResultList);
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("airCount", airCount);
+        map.put("mpCount", mpCount);
+        map.put("mpResultList", mpResultList);
         return map;
     }
 
@@ -521,40 +533,71 @@ public class DataServiceImpl implements DataService {
     public Map<String, Object> login(HttpSession session) {
         Map<String, Object> map = new HashMap<String, Object>();
         List<Table> tableList = new ArrayList<>();
+
+        Table lastAirTable = new Table();
         Table airTable = new Table();
+        Table nextAirTable = new Table();
         Table lastMpTable = new Table();
         Table mpTable = new Table();
         Table nextMpTable = new Table();
         Table flTable = new Table();
+
+        LastAir lastLastAir = lastAirRepository.findOrderByIdDescLimit1();
         Air lastAir = airRepository.getLastAir();
-        LastMp lastLastMp = lastMpRepository.getLastLastMp();
+        NextAir lastNextAir = nextAirRepository.getLastNextAir();
+        LastMp lastLastMp = lastMpRepository.findOrderByIdDescLimit1();
         Mp lastMp = mpRepository.getLastMp();
-        NextMp nextLastMp = nextMpRepository.getNextLastMp();
+        NextMp lastNextMp = nextMpRepository.findByIdByDescByLimit1();
         Fl lastFl = flRepository.getLastFl();
+
+        if (lastLastAir != null) {
+            lastAirTable.setState(lastLastAir.getDate() + " " + lastLastAir.getTakeOffTime() + " " + lastLastAir.getName() + " " + lastLastAir.getFlightNo());
+            lastAirTable.setCount(lastAirRepository.count());
+        }
+
         if (lastAir != null) {
             airTable.setState(lastAir.getDate() + " " + lastAir.getTakeOffTime() + " " + lastAir.getName() + " " + lastAir.getFlightNo());
             airTable.setCount(airRepository.count());
         }
+
+        if (lastNextAir != null) {
+            nextAirTable.setState(lastNextAir.getDate() + " " + lastNextAir.getTakeOffTime() + " " + lastNextAir.getName() + " " + lastNextAir.getFlightNo());
+            nextAirTable.setCount(nextAirRepository.count());
+        }
+
         if (lastLastMp != null) {
             lastMpTable.setState(lastLastMp.getDate() + " " + lastLastMp.getTakeOffTime() + " " + lastLastMp.getName() + " " + lastLastMp.getFlightNo());
             lastMpTable.setCount(lastMpRepository.count());
         }
+
         if (lastMp != null) {
             mpTable.setState(lastMp.getDate() + " " + lastMp.getTakeOffTime() + " " + lastMp.getName() + " " + lastMp.getFlightNo());
             mpTable.setCount(mpRepository.count());
         }
-        if (nextLastMp != null) {
-            nextMpTable.setState(nextLastMp.getDate() + " " + nextLastMp.getTakeOffTime() + " " + nextLastMp.getName() + " " + nextLastMp.getFlightNo());
+
+        if (lastNextMp != null) {
+            nextMpTable.setState(lastNextMp.getDate() + " " + lastNextMp.getTakeOffTime() + " " + lastNextMp.getName() + " " + lastNextMp.getFlightNo());
             nextMpTable.setCount(nextMpRepository.count());
         }
+
         if (lastFl != null) {
             flTable.setState(lastFl.getDate() + " " + lastFl.getTakeOffTime() + " " + lastFl.getAirline() + " " + lastFl.getFlightNo());
             flTable.setCount(flRepository.count());
         }
 
+        if (!lastAirRepository.findAll().isEmpty()) {
+            lastAirTable.setName("上月航后数据(飞行)");
+            tableList.add(lastAirTable);
+        }
+
         if (!airRepository.findAll().isEmpty()) {
             airTable.setName("本月航后数据(飞行)");
             tableList.add(airTable);
+        }
+
+        if (!nextAirRepository.findAll().isEmpty()) {
+            nextAirTable.setName("下月航后数据(飞行)");
+            tableList.add(nextAirTable);
         }
 
         if (!lastMpRepository.findAll().isEmpty()) {
@@ -576,6 +619,7 @@ public class DataServiceImpl implements DataService {
             flTable.setName("本月生产台账数据(财务)");
             tableList.add(flTable);
         }
+
         map.put("tableList", tableList);
         Date date = new Date();
         SimpleDateFormat df = new SimpleDateFormat("HH");
@@ -601,6 +645,43 @@ public class DataServiceImpl implements DataService {
             map.put("time", "晚上好！");
             session.setAttribute("time", "晚上好！");
         }
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> addLastMp(@RequestParam("file") MultipartFile file) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        String fileName = file.getOriginalFilename();
+        assert fileName != null;
+        if (fileName.length() < 5) {
+            map.put("msg", "文件格式错误");
+            return map;
+        } else {
+            String substring = fileName.substring(fileName.length() - 5);
+            if (!(substring.equals(".xlsx")) & !(substring.equals(".xlsm")) & !(fileName.substring(fileName.length() - 4).equals(".xls"))) {
+                map.put("msg", "文件类型错误");
+                return map;
+            }
+        }
+        List<LastMp> excelList;
+        try {
+            excelList = LastMpExcelUtils.addLastMpExcel(file.getInputStream());
+            if (excelList.size() <= 0) {
+                map.put("msg", "导入的数据为空或者不符合要求");
+                return map;
+            }
+            //excel的数据保存到数据库
+            try {
+                lastMpRepository.saveAll(excelList);
+            } catch (Exception e) {
+                map.put("msg", "导入的数据格式有误或者与当前已存在的数据中存在重复");
+                return map;
+            }
+        } catch (Exception e) {
+            map.put("msg", "导入异常");
+            return map;
+        }
+        map.put("msg", "导入成功");
         return map;
     }
 
@@ -642,7 +723,7 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public Map<String, Object> addLastMp(@RequestParam("file") MultipartFile file) {
+    public Map<String, Object> addNextMp(@RequestParam("file") MultipartFile file) {
         Map<String, Object> map = new HashMap<String, Object>();
         String fileName = file.getOriginalFilename();
         assert fileName != null;
@@ -656,16 +737,16 @@ public class DataServiceImpl implements DataService {
                 return map;
             }
         }
-        List<LastMp> excelList;
+        List<NextMp> excelList;
         try {
-            excelList = LastMpExcelUtils.addLastMp(file.getInputStream());
+            excelList = NextMpExcelUtils.addNextMpExcel(file.getInputStream());
             if (excelList.size() <= 0) {
                 map.put("msg", "导入的数据为空或者不符合要求");
                 return map;
             }
             //excel的数据保存到数据库
             try {
-                lastMpRepository.saveAll(excelList);
+                nextMpRepository.saveAll(excelList);
             } catch (Exception e) {
                 map.put("msg", "导入的数据格式有误或者与当前已存在的数据中存在重复");
                 return map;
@@ -679,7 +760,44 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public Map<String, Object> addNextMp(@RequestParam("file") MultipartFile file) {
+    public Map<String, Object> addLastAir(@RequestParam("file") MultipartFile file) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        String fileName = file.getOriginalFilename();
+        assert fileName != null;
+        if (fileName.length() < 5) {
+            map.put("msg", "文件格式错误");
+            return map;
+        } else {
+            String substring = fileName.substring(fileName.length() - 5);
+            if (!(substring.equals(".xlsx")) & !(substring.equals(".xlsm")) & !(fileName.substring(fileName.length() - 4).equals(".xls"))) {
+                map.put("msg", "文件类型错误");
+                return map;
+            }
+        }
+        List<LastAir> excelList;
+        try {
+            excelList = LastAirExcelUtils.addLastAir(file.getInputStream());
+            if (excelList.size() <= 0) {
+                map.put("msg", "导入的数据为空或者不符合要求");
+                return map;
+            }
+            //excel的数据保存到数据库
+            try {
+                lastAirRepository.saveAll(excelList);
+            } catch (Exception e) {
+                map.put("msg", "导入的数据格式有误或者与当前已存在的数据中存在重复");
+                return map;
+            }
+        } catch (Exception e) {
+            map.put("msg", "导入异常");
+            return map;
+        }
+        map.put("msg", "导入成功");
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> addNextAir(@RequestParam("file") MultipartFile file) {
         Map<String, Object> map = new HashMap<String, Object>();
         String fileName = file.getOriginalFilename();
         assert fileName != null;
@@ -692,16 +810,16 @@ public class DataServiceImpl implements DataService {
                 return map;
             }
         }
-        List<NextMp> excelList;
+        List<NextAir> excelList;
         try {
-            excelList = NextMpExcelUtils.addNextMp(file.getInputStream());
+            excelList = NextAirExcelUtils.addNextAir(file.getInputStream());
             if (excelList.size() <= 0) {
                 map.put("msg", "导入的数据为空或者不符合要求");
                 return map;
             }
             //excel的数据保存到数据库
             try {
-                nextMpRepository.saveAll(excelList);
+                nextAirRepository.saveAll(excelList);
             } catch (Exception e) {
                 map.put("msg", "导入的数据格式有误或者与当前已存在的数据中存在重复");
                 return map;
@@ -929,10 +1047,10 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public String compareAirMp(Model model) throws ParseException {
-        HashMap<String,Object> map = getAirMpCompareList();
-        model.addAttribute("mpCount",map.get("mpCount"));
-        model.addAttribute("airCount",map.get("airCount"));
-        model.addAttribute("mpResultList",map.get("mpResultList"));
+        HashMap<String, Object> map = getAirMpCompareList();
+        model.addAttribute("mpCount", map.get("mpCount"));
+        model.addAttribute("airCount", map.get("airCount"));
+        model.addAttribute("mpResultList", map.get("mpResultList"));
         return "data/compareAirMp.html";
     }
 
@@ -950,8 +1068,8 @@ public class DataServiceImpl implements DataService {
         cellStyle.setBorderRight(BorderStyle.THIN);
         cellStyle.setBorderTop(BorderStyle.THIN);
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
-        HashMap<String,Object> map = getAirMpCompareList();
-        List<Mp> airMpList = (List<Mp>)map.get("mpResultList");
+        HashMap<String, Object> map = getAirMpCompareList();
+        List<Mp> airMpList = (List<Mp>) map.get("mpResultList");
         String fileName = "飞行与人力对比数据" + ".xls";
         int rowNum = 1;
         String[] headers = {"日期", "航班号", "航线", "人员编号", "姓名", "资质"};
@@ -990,10 +1108,13 @@ public class DataServiceImpl implements DataService {
     public Map<String, Object> deleteAll() {
         Map<String, Object> map = new HashMap<String, Object>();
         try {
+
             airRepository.truncateAir();
+            lastAirRepository.truncateLastAir();
             lastMpRepository.truncateLastMp();
             mpRepository.truncateMp();
             nextMpRepository.truncateNextMp();
+            nextAirRepository.truncateNextAir();
             flRepository.truncateFl();
         } catch (Exception e) {
             map.put("msg", "清空失败,请重试");
@@ -1030,6 +1151,19 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
+    public Map<String, Object> deleteNextMp() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        try {
+            nextMpRepository.truncateNextMp();
+        } catch (Exception e) {
+            map.put("msg", "清空失败,请重试");
+            return map;
+        }
+        map.put("msg", "清空成功");
+        return map;
+    }
+
+    @Override
     public Map<String, Object> deleteAir() {
         Map<String, Object> map = new HashMap<String, Object>();
         try {
@@ -1043,10 +1177,10 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public Map<String, Object> deleteLastMp() {
+    public Map<String, Object> deleteLastAir() {
         Map<String, Object> map = new HashMap<String, Object>();
         try {
-            lastMpRepository.truncateLastMp();
+            lastAirRepository.truncateLastAir();
         } catch (Exception e) {
             map.put("msg", "清空失败,请重试");
             return map;
@@ -1056,10 +1190,23 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public Map<String, Object> deleteNextMp() {
+    public Map<String, Object> deleteNextAir() {
         Map<String, Object> map = new HashMap<String, Object>();
         try {
-            nextMpRepository.truncateNextMp();
+            nextAirRepository.truncateNextAir();
+        } catch (Exception e) {
+            map.put("msg", "清空失败,请重试");
+            return map;
+        }
+        map.put("msg", "清空成功");
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> deleteLastMp() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        try {
+            lastMpRepository.truncateLastMp();
         } catch (Exception e) {
             map.put("msg", "清空失败,请重试");
             return map;

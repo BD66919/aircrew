@@ -69,14 +69,18 @@
                         上传Excel数据 <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" style="min-width: 90%">
+                        <li><a href="" data-toggle="modal" data-target="#addLastAir"
+                               class="dropdown-item">上传上月航后数据(飞行)</a></li>
                         <li><a href="" data-toggle="modal" data-target="#addAir" class="dropdown-item">上传本月航后数据(飞行)</a>
                         </li>
-                        <li><a href="" data-toggle="modal" data-target="#addLastMp"
-                               class="dropdown-item">上传上月飞行小时费(人力)</a></li>
+                        <li><a href="" data-toggle="modal" data-target="#addNextAir"
+                               class="dropdown-item">上传下月航后数据(飞行)</a></li>
+                        <li><a href="" data-toggle="modal" data-target="#addLastMp" class="dropdown-item">上传上月飞行小时费(人力)</a>
+                        </li>
                         <li><a href="" data-toggle="modal" data-target="#addMp" class="dropdown-item">上传本月飞行小时费(人力)</a>
                         </li>
-                        <li><a href="" data-toggle="modal" data-target="#addNextMp"
-                               class="dropdown-item">上传下月飞行小时费(人力)</a></li>
+                        <li><a href="" data-toggle="modal" data-target="#addNextMp" class="dropdown-item">上传下月飞行小时费(人力)</a>
+                        </li>
                         <li><a href="" data-toggle="modal" data-target="#addFl" class="dropdown-item">上传本月生产台账(财务）</a>
                         </li>
                     </ul>
@@ -88,14 +92,21 @@
                     </button>
                     <ul class="dropdown-menu" style="min-width: 90%">
                         <li><a href="" data-toggle="modal" data-target="#deleteAll" class="dropdown-item">全部清空</a></li>
+                        <li><a href="" data-toggle="modal" data-target="#deleteLastAir" class="dropdown-item">清空上月航后数据(飞行)</a>
                         <li><a href="" data-toggle="modal" data-target="#deleteAir"
-                               class="dropdown-item">清空本月航后数据(飞行)</a></li>
-                        <li><a href="" data-toggle="modal" data-target="#deleteLastMp" class="dropdown-item">清空上月飞行小时费(人力)</a>
+                               class="dropdown-item">清空本月航后数据(飞行)</a>
                         </li>
+                        <li><a href="" data-toggle="modal" data-target="#deleteNextAir" class="dropdown-item">清空下月航后数据(飞行)</a>
+                        </li>
+                        <li><a href="" data-toggle="modal" data-target="#deleteLastMp"
+                               class="dropdown-item">清空上月飞行小时费(人力)</a></li>
+
                         <li><a href="" data-toggle="modal" data-target="#deleteMp"
                                class="dropdown-item">清空本月飞行小时费(人力)</a></li>
-                        <li><a href="" data-toggle="modal" data-target="#deleteNextMp" class="dropdown-item">清空下月飞行小时费(人力)</a>
-                        </li>
+
+                        <li><a href="" data-toggle="modal" data-target="#deleteNextMp"
+                               class="dropdown-item">清空下月飞行小时费(人力)</a></li>
+
                         <li><a href="" data-toggle="modal" data-target="#deleteFl"
                                class="dropdown-item">清空本月生产台账(财务）</a></li>
                     </ul>
@@ -161,13 +172,33 @@
 </div>
 <!-- End of Page Wrapper -->
 
+<div class="modal fade" id="addLastAir" tabindex="-1" role="dialog" aria-labelledby="coverUpLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="addLastAirLabel" style=" position:absolute; width:200px; height:10px; ">
+                    上传上月飞行数据</h4>
+            </div>
+            <div class="modal-body"></div>
+            <P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;请选择航后数据查询Excel表</P>
+            <input type="file" name="addLastAirFile" id="addLastAirFile" style="margin-left:20px;"/>
+            <div class="modal-footer">
+                <span id="LastAirStatus" style="color: red"></span>
+                <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+                <input type="submit" value="提交" class="btn btn-success" id="addLastAirSubmit">
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="addAir" tabindex="-1" role="dialog" aria-labelledby="addUpLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 <h4 class="modal-title" id="addUpLabel" style=" position:absolute; width:200px; height:10px; ">
-                    上传飞行数据</h4>
+                    上传本月飞行数据</h4>
             </div>
             <div class="modal-body"></div>
             <P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;请选择航后数据查询Excel表</P>
@@ -176,6 +207,46 @@
                 <span id="AirStatus" style="color: red"></span>
                 <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
                 <input type="submit" value="提交" class="btn btn-success" id="addAirSubmit">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addNextAir" tabindex="-1" role="dialog" aria-labelledby="coverUpLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="addNextAirLabel" style=" position:absolute; width:200px; height:10px; ">
+                    上传下月飞行数据</h4>
+            </div>
+            <div class="modal-body"></div>
+            <P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;请选择航后数据查询Excel表</P>
+            <input type="file" name="addNextAirFile" id="addNextAirFile" style="margin-left:20px;"/>
+            <div class="modal-footer">
+                <span id="NextAirStatus" style="color: red"></span>
+                <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+                <input type="submit" value="提交" class="btn btn-success" id="addNextAirSubmit">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addLastMp" tabindex="-1" role="dialog" aria-labelledby="coverUpLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="addLastMpLabel" style=" position:absolute; width:200px; height:10px; ">
+                    上传上月人力数据</h4>
+            </div>
+            <div class="modal-body"></div>
+            <P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;请选择飞行小时费Excel表</P>
+            <input type="file" name="addLastMpFile" id="addLastMpFile" style="margin-left:20px;"/>
+            <div class="modal-footer">
+                <span id="LastMpStatus" style="color: red"></span>
+                <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+                <input type="submit" value="提交" class="btn btn-success" id="addLastMpSubmit">
             </div>
         </div>
     </div>
@@ -201,26 +272,6 @@
     </div>
 </div>
 
-<div class="modal fade" id="addLastMp" tabindex="-1" role="dialog" aria-labelledby="coverUpLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title" id="addLastMpLabel" style=" position:absolute; width:200px; height:10px; ">
-                    上传上月人力数据</h4>
-            </div>
-            <div class="modal-body"></div>
-            <P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;请选择飞行小时费Excel表</P>
-            <input type="file" name="addMpFile" id="addLastMpFile" style="margin-left:20px;"/>
-            <div class="modal-footer">
-                <span id="LastMpStatus" style="color: red"></span>
-                <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
-                <input type="submit" value="提交" class="btn btn-success" id="addLastMpSubmit">
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="modal fade" id="addNextMp" tabindex="-1" role="dialog" aria-labelledby="coverUpLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -231,7 +282,7 @@
             </div>
             <div class="modal-body"></div>
             <P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;请选择飞行小时费Excel表</P>
-            <input type="file" name="addMpFile" id="addNextMpFile" style="margin-left:20px;"/>
+            <input type="file" name="addNextMpFile" id="addNextMpFile" style="margin-left:20px;"/>
             <div class="modal-footer">
                 <span id="NextMpStatus" style="color: red"></span>
                 <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
@@ -262,7 +313,6 @@
     </div>
 </div>
 
-
 <div class="modal fade" id="deleteAll" tabindex="-1" role="dialog" aria-labelledby="addUpLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
@@ -274,6 +324,22 @@
                 <span id="deleteAllStatus" style="color: red"></span>
                 <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
                 <input type="submit" value="确认" class="btn btn-success" id="deleteAllSubmit">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteLastAir" tabindex="-1" role="dialog" aria-labelledby="addUpLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-footer">
+                <div align="left">
+                    <h4 class="modal-title">清空上月航后数据(飞行)</h4>
+                </div>
+                <br>
+                <span id="deleteLastAirStatus" style="color: red"></span>
+                <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+                <input type="submit" value="确认" class="btn btn-success" id="deleteLastAirSubmit">
             </div>
         </div>
     </div>
@@ -295,17 +361,17 @@
     </div>
 </div>
 
-<div class="modal fade" id="deleteMp" tabindex="-1" role="dialog" aria-labelledby="addUpLabel" aria-hidden="true">
+<div class="modal fade" id="deleteNextAir" tabindex="-1" role="dialog" aria-labelledby="addUpLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-footer">
                 <div align="left">
-                    <h4 class="modal-title">清空本月飞行小时费数据(人力)</h4>
+                    <h4 class="modal-title">清空下月航后数据(飞行)</h4>
                 </div>
                 <br>
-                <span id="deleteMpStatus" style="color: red"></span>
+                <span id="deleteNextAirStatus" style="color: red"></span>
                 <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
-                <input type="submit" value="确认" class="btn btn-success" id="deleteMpSubmit">
+                <input type="submit" value="确认" class="btn btn-success" id="deleteNextAirSubmit">
             </div>
         </div>
     </div>
@@ -322,6 +388,22 @@
                 <span id="deleteLastMpStatus" style="color: red"></span>
                 <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
                 <input type="submit" value="确认" class="btn btn-success" id="deleteLastMpSubmit">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteMp" tabindex="-1" role="dialog" aria-labelledby="addUpLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-footer">
+                <div align="left">
+                    <h4 class="modal-title">清空本月飞行小时费数据(人力)</h4>
+                </div>
+                <br>
+                <span id="deleteMpStatus" style="color: red"></span>
+                <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+                <input type="submit" value="确认" class="btn btn-success" id="deleteMpSubmit">
             </div>
         </div>
     </div>

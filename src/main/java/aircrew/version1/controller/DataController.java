@@ -28,19 +28,7 @@ import java.util.Map;
 @Controller
 public class DataController {
 
-    @Autowired
-    AirRepository airRepository;
-
-    @Autowired
-    MpRepository mpRepository;
-
-    @Autowired
-    CadreRepository cadreRepository;
-
-    @Autowired
-    LastMpRepository lastMpRepository;
-
-    private DataService dataService;
+    private final DataService dataService;
 
     @Autowired
     public DataController(DataService dataService){
@@ -62,26 +50,38 @@ public class DataController {
         return dataService.addAir(file);
     }
 
-    @PostMapping(value = "/addMp")
-    @ResponseBody
-    public Map<String,Object> addMp(@RequestParam("file") MultipartFile file) {
-        return dataService.addMp(file);
-    }
-
-    @PostMapping(value = "/addFl")
-    @ResponseBody
-    public Map<String,Object> addFl(@RequestParam("file") MultipartFile file) { return dataService.addFl(file); }
-
     @PostMapping(value = "/addLastMp")
     @ResponseBody
     public Map<String,Object> addLastMp(@RequestParam("file") MultipartFile file) {
         return dataService.addLastMp(file);
     }
 
+    @PostMapping(value = "/addMp")
+    @ResponseBody
+    public Map<String,Object> addMp(@RequestParam("file") MultipartFile file) {
+        return dataService.addMp(file);
+    }
+
     @PostMapping(value = "/addNextMp")
     @ResponseBody
     public Map<String,Object> addNextMp(@RequestParam("file") MultipartFile file) {
         return dataService.addNextMp(file);
+    }
+
+    @PostMapping(value = "/addFl")
+    @ResponseBody
+    public Map<String,Object> addFl(@RequestParam("file") MultipartFile file) { return dataService.addFl(file); }
+
+    @PostMapping(value = "/addLastAir")
+    @ResponseBody
+    public Map<String,Object> addLastAir(@RequestParam("file") MultipartFile file) {
+        return dataService.addLastAir(file);
+    }
+
+    @PostMapping(value = "/addNextAir")
+    @ResponseBody
+    public Map<String,Object> addNextAir(@RequestParam("file") MultipartFile file) {
+        return dataService.addNextAir(file);
     }
 
     @PostMapping(value = "/addAirline")
@@ -114,10 +114,22 @@ public class DataController {
         return dataService.deleteAll();
     }
 
+    @PostMapping(value = "/deleteLastMp")
+    @ResponseBody
+    public Map<String,Object> deleteLastMp(){
+        return dataService.deleteLastMp();
+    }
+
     @PostMapping(value = "/deleteMp")
     @ResponseBody
     public Map<String,Object> deleteMp(){
         return dataService.deleteMp();
+    }
+
+    @PostMapping(value = "/deleteNextMp")
+    @ResponseBody
+    public Map<String,Object> deleteNextMp(){
+        return dataService.deleteNextMp();
     }
 
     @PostMapping(value = "/deleteFl")
@@ -130,6 +142,18 @@ public class DataController {
     @ResponseBody
     public Map<String,Object> deleteAir(){
         return dataService.deleteAir();
+    }
+
+    @PostMapping(value = "/deleteLastAir")
+    @ResponseBody
+    public Map<String,Object> deleteLastAir(){
+        return dataService.deleteLastAir();
+    }
+
+    @PostMapping(value = "/deleteNextAir")
+    @ResponseBody
+    public Map<String,Object> deleteNextAir(){
+        return dataService.deleteNextAir();
     }
 
     @PostMapping(value = "/deleteAirline={airline}")
@@ -150,18 +174,6 @@ public class DataController {
     @PostMapping(value = "/deleteStageDoubleFlight={number}")
     public String deleteStageDoubleFlight(@PathVariable String number){
         return dataService.deleteStageDoubleFlight(number);
-    }
-
-    @PostMapping(value = "/deleteLastMp")
-    @ResponseBody
-    public Map<String,Object> deleteLastMp(){
-        return dataService.deleteLastMp();
-    }
-
-    @PostMapping(value = "/deleteNextMp")
-    @ResponseBody
-    public Map<String,Object> deleteNextMp(){
-        return dataService.deleteNextMp();
     }
 
     @PostMapping(value = "/updateAirline")
@@ -220,7 +232,6 @@ public class DataController {
     @GetMapping("/data/flAirExcelDownload")
     public void flAirExcelDownload(HttpServletResponse response) throws IOException, ParseException {
         dataService.flAirExcelDownload(response);
-
     }
 
     /**
@@ -234,7 +245,6 @@ public class DataController {
     @GetMapping("/data/airMpExcelDownload")
     public void airMpExcelDownload(HttpServletResponse response) throws IOException, ParseException {
         dataService.airMpExcelDownload(response);
-
     }
 
 }
