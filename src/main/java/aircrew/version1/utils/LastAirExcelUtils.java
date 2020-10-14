@@ -1,6 +1,5 @@
 package aircrew.version1.utils;
 
-import aircrew.version1.entity.Air;
 import aircrew.version1.entity.LastAir;
 import org.apache.poi.ss.usermodel.*;
 import java.io.InputStream;

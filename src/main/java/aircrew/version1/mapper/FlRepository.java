@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public interface FlRepository extends JpaRepository<Fl,Integer> {
     @Query(value = "select * from fl order by id DESC limit 1",nativeQuery =  true)
-    Fl getLastFl();
+    Fl findOrderByIdDescLimit1();
 
     @Transactional
     @Modifying

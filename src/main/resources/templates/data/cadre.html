@@ -6,31 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="http://www.airchina.com.cn/favicon.ico" />
+    <link rel="icon" href="http://www.airchina.com.cn/favicon.ico"/>
     <title>干部查看</title>
     <link href="/aircrew/static/asserts/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
     <link href="/aircrew/static/asserts/css/sb-admin-2.min.css" rel="stylesheet">
     <link href="/aircrew/static/asserts/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
 
 <body id="page-top" class="sidebar-toggled">
-<div id="wrapper" >
+<div id="wrapper">
     <div th:insert="commons/bar::sidebar"></div>
-    <div id="content-wrapper" class="d-flex flex-column" style="position: relative;left: 100px;width: 93%;" >
+    <div id="content-wrapper" class="d-flex flex-column" style="position: relative;left: 100px;width: 93%;">
         <div id="content">
             <nav class="navbar navbar-expand navbar-light bg-white topbar mb-5 static-top shadow">
-                <div >
-                    <div >
+                <div>
+                    <div>
                         <h1 class="h3 text-gray-700 mb-4" style="margin-left:10px;margin-top: 30px;">飞行任务书审核辅助系统</h1>
                     </div>
                 </div>
                 <a>
-                    <a style="display:block;position:absolute;right:1%;top:30%;color:grey"  href="/aircrew/logout" >退出</a>
+                    <a style="display:block;position:absolute;right:1%;top:30%;color:grey" href="/aircrew/logout">退出</a>
                 </a>
             </nav>
             <div class="container-fluid">
-                <div class="card shadow mb-5" >
+                <div class="card shadow mb-5">
                     <div class="card-header py-3">
                         <h6 class="m-0 font-weight-bold text-primary">干部查看</h6>
                     </div>
@@ -56,12 +57,22 @@
                                     <td th:text="${cadre.qualify}"></td>
                                     <td th:text="${cadre.category}"></td>
                                     <td>
-                                        <button class="btn-sm btn-primary" data-toggle="modal" data-target="#edit" th:data-eid="${cadre.eid}" th:data-name="${cadre.name}" th:data-department="${cadre.department}" th:data-qualify="${cadre.qualify}" th:data-category="${cadre.category}" >编辑</button>
-                                        <button th:attr="del_uri=@{/deleteCadre=}+${cadre.id}"  class="btn btn-sm btn-danger deleteBtn">删除</button>
+                                        <button class="btn-sm btn-primary" data-toggle="modal" data-target="#edit"
+                                                th:data-eid="${cadre.eid}" th:data-name="${cadre.name}"
+                                                th:data-department="${cadre.department}"
+                                                th:data-qualify="${cadre.qualify}" th:data-category="${cadre.category}">
+                                            编辑
+                                        </button>
+                                        <button th:attr="del_uri=@{/deleteCadre=}+${cadre.id}"
+                                                class="btn btn-sm btn-danger deleteBtn">删除
+                                        </button>
                                     </td>
                                 </tr>
                                 </tbody>
                             </table>
+                            <p><a style="display:block;position:absolute;left:2%;color:grey"
+                                  href="/aircrew/data/data.html">返回</a>
+                            </p>
                             <div style="text-align: center">
                                 <p>共 <span th:text="${number}"></span> 位干部管理人员</p>
                             </div>
@@ -88,32 +99,32 @@
         <div class="modal-content">
             <div class="modal-body">
                 <div class="form-group" align="left">
-                    <label for="eid" >员工编号(不可修改)</label>
-                    <input type="text" class="form-control" id = "eid" name="eid" placeholder="员工号" readonly="readonly"/>
+                    <label for="eid">员工编号(不可修改)</label>
+                    <input type="text" class="form-control" id="eid" name="eid" placeholder="员工号" readonly="readonly"/>
                 </div>
 
                 <div class="form-group" align="left">
-                    <label for="name" >姓名</label>
-                    <input type="text" class="form-control" id ="name" name="name" placeholder="姓名" />
+                    <label for="name">姓名</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="姓名"/>
                 </div>
 
                 <div class="form-group" align="left">
                     <label for="department">部门</label>
-                    <input type="text" class="form-control" id = "department" name="department" placeholder="部门" />
+                    <input type="text" class="form-control" id="department" name="department" placeholder="部门"/>
                 </div>
 
                 <div class="form-group" align="left">
                     <label for="qualify">技术资格</label>
-                    <input type="text" class="form-control" id = "qualify" name="qualify" placeholder="技术资格" />
+                    <input type="text" class="form-control" id="qualify" name="qualify" placeholder="技术资格"/>
                 </div>
 
                 <div class="form-group" align="left">
                     <label for="category">空勤人员类别</label>
-                    <input type="text" class="form-control" id = "category" name="category" placeholder="空勤人员类别" />
+                    <input type="text" class="form-control" id="category" name="category" placeholder="空勤人员类别"/>
                 </div>
                 <span id="cadreStatus" style="color: red"></span>
                 <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
-                <button type="submit" class="btn btn-success" id="updateCadreSubmit" th:text="修改" ></button>
+                <button type="submit" class="btn btn-success" id="updateCadreSubmit" th:text="修改"></button>
             </div>
         </div>
     </div>
@@ -123,7 +134,7 @@
 </div>
 </body>
 <script>
-    $('#edit').on("show.bs.modal",function(e){
+    $('#edit').on("show.bs.modal", function (e) {
         var eid = $(e.relatedTarget).data("eid");
         var name = $(e.relatedTarget).data("name");
         var department = $(e.relatedTarget).data("department");
@@ -137,29 +148,29 @@
         modal.find('#category').val(category);
     });
 
-    $('#updateCadreSubmit').click(function (){
+    $('#updateCadreSubmit').click(function () {
         var eid = document.getElementById("eid").value;
         var name = document.getElementById("name").value;
         var department = document.getElementById("department").value;
         var qualify = document.getElementById("qualify").value;
         var category = document.getElementById("category").value;
         $.ajax({
-            type:"post",
-            url:"/aircrew/updateCadre",
-            data:{
-                eid : eid,
-                name : name,
-                department : department,
-                qualify : qualify,
-                category : category
+            type: "post",
+            url: "/aircrew/updateCadre",
+            data: {
+                eid: eid,
+                name: name,
+                department: department,
+                qualify: qualify,
+                category: category
             },
-            dataType : "json",
-            success : function(data) {
+            dataType: "json",
+            success: function (data) {
                 var msg = data.msg;
-                if(msg==="修改成功")
-                    $('#cadreStatus').css('color','green');
+                if (msg === "修改成功")
+                    $('#cadreStatus').css('color', 'green');
                 else
-                    $('#cadreStatus').css('color','red');
+                    $('#cadreStatus').css('color', 'red');
                 $('#cadreStatus').html(msg);
                 self.setInterval(function () {  // 这个方法是说在延迟两秒后执行大括号里的方法
                     location.reload(true);   // 这个方法是刷新当前页面
@@ -169,10 +180,9 @@
     });
 
     $(".deleteBtn").click(function () {
-        if(confirm('确认删除?')){
-            $("#deleteCadreForm").attr("action",$(this).attr("del_uri")).submit();
-        }
-        else
+        if (confirm('确认删除?')) {
+            $("#deleteCadreForm").attr("action", $(this).attr("del_uri")).submit();
+        } else
             return false;
     })
 

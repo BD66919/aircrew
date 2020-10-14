@@ -63,8 +63,8 @@ public class LoginController {
         loginPwd = getMD5String(loginPwd);
         System.out.println(loginPwd);
         UsernamePasswordToken token = new UsernamePasswordToken(loginName,loginPwd);
-        String userName = userRepository.getUserName(loginName);
-        String department = userRepository.getDepartment(loginName);
+        String userName = userRepository.findUserNameByLoginName(loginName);
+        String department = userRepository.findDepartmentByLoginName(loginName);
         try{
             subject.login(token);
             session.setAttribute("userName",userName);

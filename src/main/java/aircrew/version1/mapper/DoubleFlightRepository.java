@@ -1,6 +1,5 @@
 package aircrew.version1.mapper;
 
-import aircrew.version1.entity.Air;
 import aircrew.version1.entity.DoubleFlight;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,51 +17,54 @@ public interface DoubleFlightRepository extends JpaRepository<DoubleFlight,Integ
     @Query(value = "truncate table doubleflight",nativeQuery = true)
     void truncateDoubleFlight();
 
-    @Query(value = "select * from doubleFlight order by id DESC limit 1",nativeQuery =  true)
-    DoubleFlight findDescLimit1();
-
     @Query(value = "select flConfirm from confirm ",nativeQuery =  true)
-    String getFlConfirm();
+    String findByFlConfirm();
 
     @Query(value = "select airConfirm from confirm ",nativeQuery =  true)
-    String getAirConfirm();
+    String findByAirConfirm();
 
     @Query(value = "select mpConfirm from confirm ",nativeQuery =  true)
-    String getMpConfirm();
+    String findByMpConfirm();
 
     @Query(value = "select property from property",nativeQuery = true)
-    List<String> propertiesList();
+    List<String> findAllProperty();
 
     @Query(value = "select * from doubleFlight where isMore = 1",nativeQuery = true)
     List<DoubleFlight> findByIsMore();
 
+    @Query(value = "select * from doubleFlight where isMore is null order by id Desc limit 1",nativeQuery = true)
+    DoubleFlight findByNoIsMoreDescLimit1();
+
     @Query(value = "select * from doubleFlight where isMore = 1 order by id Desc limit 1",nativeQuery = true)
     DoubleFlight findByIsMoreDescLimit1();
 
-    @Transactional
-    @Modifying
-    @Query(value = "update doubleFlight as d set d.firstQualification='J机长(原为M见习机长)' where d.firstQualification='M见习机长' ",nativeQuery = true)
-    void firstMtoJ();
+    @Query(value = "select mChangeToJStatus from confirm ",nativeQuery = true)
+    String findByMChangeToj();
 
     @Transactional
     @Modifying
-    @Query(value = "update doubleFlight as d set d.secondQualification='J机长(原为M见习机长)' where d.secondQualification='M见习机长' ",nativeQuery = true)
-    void secondMtoJ();
+    @Query(value = "update doubleFlight as d set d.firstQualification=?1 where d.firstQualification=?2",nativeQuery = true)
+    void updateFirstQualification(String newQualification,String oldQualification);
 
     @Transactional
     @Modifying
-    @Query(value = "update doubleFlight as d set d.thirdQualification='J机长(原为M见习机长)' where d.thirdQualification='M见习机长' ",nativeQuery = true)
-    void thirdMtoJ();
+    @Query(value = "update doubleFlight as d set d.secondQualification=?1 where d.secondQualification=?2",nativeQuery = true)
+    void  updateSecondQualification(String newQualification,String oldQualification);
 
     @Transactional
     @Modifying
-    @Query(value = "update doubleFlight as d set d.fourthQualification='J机长(原为M见习机长)' where d.fourthQualification='M见习机长' ",nativeQuery = true)
-    void fourthMtoJ();
+    @Query(value = "update doubleFlight as d set d.thirdQualification=?1 where d.thirdQualification=?2",nativeQuery = true)
+    void updateThirdQualification(String newQualification,String oldQualification);
 
     @Transactional
     @Modifying
-    @Query(value = "update doubleFlight as d set d.fifthQualification='J机长(原为M见习机长)' where d.fifthQualification='M见习机长' ",nativeQuery = true)
-    void fifthMtoJ();
+    @Query(value = "update doubleFlight as d set d.fourthQualification=?1 where d.fourthQualification=?2",nativeQuery = true)
+    void updateFourthQualification(String newQualification,String oldQualification);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update doubleFlight as d set d.fifthQualification=?1 where d.fifthQualification=?2",nativeQuery = true)
+    void updateFifthQualification(String newQualification,String oldQualification);
 
     @Transactional
     @Modifying
@@ -76,32 +78,21 @@ public interface DoubleFlightRepository extends JpaRepository<DoubleFlight,Integ
 
     @Transactional
     @Modifying
-    @Query(value = "UPDATE confirm SET airConfirm='已确认'",nativeQuery = true)
-    void airConfirm();
+    @Query(value = "UPDATE confirm SET airConfirm=?1",nativeQuery = true)
+    void updateAirConfirm(String airConfirm);
 
     @Transactional
     @Modifying
-    @Query(value = "UPDATE confirm SET flConfirm='已确认'",nativeQuery = true)
-    void flConfirm();
+    @Query(value = "UPDATE confirm SET flConfirm=?1",nativeQuery = true)
+    void updateFlConfirm(String flConfirm);
 
     @Transactional
     @Modifying
-    @Query(value = "UPDATE confirm SET mpConfirm='已确认'",nativeQuery = true)
-    void mpConfirm();
+    @Query(value = "UPDATE confirm SET mpConfirm=?1",nativeQuery = true)
+    void updateMpConfirm(String mpConfirm);
 
     @Transactional
     @Modifying
-    @Query(value = "UPDATE confirm SET airConfirm='未确认'",nativeQuery = true)
-    void cancelAirConfirm();
-
-    @Transactional
-    @Modifying
-    @Query(value = "UPDATE confirm SET flConfirm='未确认'",nativeQuery = true)
-    void cancelFlConfirm();
-
-    @Transactional
-    @Modifying
-    @Query(value = "UPDATE confirm SET mpConfirm='未确认'",nativeQuery = true)
-    void cancelMpConfirm();
-
+    @Query(value = "UPDATE confirm SET mChangeToJStatus=?1",nativeQuery = true)
+    void updateMChangeToJStatus(String mChangeToJStatus);
 }

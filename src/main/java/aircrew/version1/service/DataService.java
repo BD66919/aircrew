@@ -1,7 +1,6 @@
 package aircrew.version1.service;
 
 import aircrew.version1.entity.Air;
-import org.apache.ibatis.annotations.Mapper;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;

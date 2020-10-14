@@ -105,6 +105,19 @@ public class Mp {
         this.property = property;
     }
 
+    public Mp(String date,int eid,String name,String tcc,String flightNo,String property,String post,String takeOffTime,String type,String airplaneNumber){
+        this.date = date;
+        this.eid = eid;
+        this.name = name;
+        this.tcc = tcc;
+        this.flightNo = flightNo;
+        this.property = property;
+        this.post = post;
+        this.takeOffTime = takeOffTime;
+        this.type = type;
+        this.airplaneNumber = airplaneNumber;
+    }
+
     public Mp(LastMp lastMp) {
         this.id = lastMp.getId();
         this.eid = lastMp.getEid();

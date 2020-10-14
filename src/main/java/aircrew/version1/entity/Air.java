@@ -37,6 +37,9 @@ public class Air {
     private String arr;
 
     @Column
+    private String tcc;
+
+    @Column
     private String landTime;
 
     @Column

@@ -110,6 +110,7 @@ public class AirExcelUtils {
                             SocExcel.setDate(cellData.split(" ")[0].replace("/","-"));
                         }else if (j == 6) {
                             SocExcel.setArr(cellData);
+                            SocExcel.setTcc(SocExcel.getDep()+"-"+SocExcel.getArr());
                         }else if (j == 7) {
                             SocExcel.setLandTime(cellData.split(" ")[1]);
                         }else if (j == 8) {

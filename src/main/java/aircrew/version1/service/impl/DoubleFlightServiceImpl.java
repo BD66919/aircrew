@@ -64,7 +64,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
     public Map<String, Object> addProperty(HttpServletRequest request) {
         Map<String, Object> map = new HashMap<>();
         String property = request.getParameter("property");
-        List<String> propertiesList = doubleFlightRepository.propertiesList();
+        List<String> propertiesList = doubleFlightRepository.findAllProperty();
         if (propertiesList.contains(property)) {
             map.put("msg", "已存在该资质");
             return map;
@@ -82,7 +82,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             model.addAttribute("doubleFlight", "待生成");
         else
             model.addAttribute("doubleFlight", "双机长航班表");
-        DoubleFlight doubleFlight = doubleFlightRepository.findDescLimit1();
+        DoubleFlight doubleFlight = doubleFlightRepository.findByNoIsMoreDescLimit1();
         if (doubleFlightRepository.findAll().size() != 0) {
             model.addAttribute("doubleFlightState", doubleFlight.getDate() + " " + doubleFlight.getNo() + " " + doubleFlight.getLine());
             model.addAttribute("doubleFlightCount", String.valueOf(doubleFlightRepository.count() - doubleFlightRepository.findByIsMore().size()));
@@ -105,44 +105,44 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             model.addAttribute("moreDoubleFlightCount", "0");
         }
 
-        if (doubleFlightRepository.getFlConfirm() == null) {
+        if (doubleFlightRepository.findByFlConfirm() == null) {
             model.addAttribute("flConfirm", "未确认");
         }
-        if (doubleFlightRepository.getAirConfirm() == null) {
+        if (doubleFlightRepository.findByAirConfirm() == null) {
             model.addAttribute("airConfirm", "未确认");
         }
-        if (doubleFlightRepository.getMpConfirm() == null) {
+        if (doubleFlightRepository.findByMpConfirm() == null) {
             model.addAttribute("mpConfirm", "未确认");
         } else {
-            if (doubleFlightRepository.getFlConfirm().equals("未确认"))
+            if (doubleFlightRepository.findByFlConfirm().equals("未确认"))
                 model.addAttribute("flConfirm", "未确认");
             else
                 model.addAttribute("flConfirm", "已确认");
 
-            if (doubleFlightRepository.getAirConfirm().equals("未确认"))
+            if (doubleFlightRepository.findByAirConfirm().equals("未确认"))
                 model.addAttribute("airConfirm", "未确认");
             else
                 model.addAttribute("airConfirm", "已确认");
 
-            if (doubleFlightRepository.getMpConfirm().equals("未确认"))
+            if (doubleFlightRepository.findByMpConfirm().equals("未确认"))
                 model.addAttribute("mpConfirm", "未确认");
             else
                 model.addAttribute("mpConfirm", "已确认");
         }
+        model.addAttribute("mChangeToJStatus", doubleFlightRepository.findByMChangeToj());
         model.addAttribute("time", session.getAttribute("time"));
         return "doubleFlight/flight.html";
     }
 
     @Override
     public String property(Model model) {
-        List<String> propertiesList = doubleFlightRepository.propertiesList();
+        List<String> propertiesList = doubleFlightRepository.findAllProperty();
         model.addAttribute("propertiesList", propertiesList);
         return "doubleFlight/property.html";
     }
 
     @Override
     public Map<String, Object> calculateFlight(HttpServletRequest request) {
-
         String doubleFlightStatus = request.getParameter("doubleFlight");
         String cadreStatus = request.getParameter("cadre");
         String nightFlightStatus = request.getParameter("nightFlight");
@@ -153,10 +153,11 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             return map;
         }
 
-        doubleFlightRepository.cancelMpConfirm();
-        doubleFlightRepository.cancelFlConfirm();
-        doubleFlightRepository.cancelAirConfirm();
+        doubleFlightRepository.updateMpConfirm("未确认");
+        doubleFlightRepository.updateFlConfirm("未确认");
+        doubleFlightRepository.updateAirConfirm("未确认");
         doubleFlightRepository.truncateDoubleFlight();
+
         //生成双组航班
         List<DoubleFlight> doubleFlightList = new ArrayList<>();
         List<Mp> moreMpList = new ArrayList<>();
@@ -172,31 +173,33 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
         DoubleFlight doubleFlightBasic = new DoubleFlight();
 
         //生成双机长航班
-        List<Mp> doubleMpByFlightNoOrderList = mpRepository.orderByFlightNo();
+        List<Mp> doubleMpByFlightNoOrderList = mpRepository.findOrderByDateAndFlightNoAndTakeOffTimeAndProperty();
         //统计机长数量是否等于2
         int count = 0;
         List<Mp> doubleMpList = new ArrayList<>();
         //判断是否满足双机长条件
         String doubleFlightNo = doubleMpByFlightNoOrderList.get(0).getFlightNo();
+        String takeOffTime = doubleMpByFlightNoOrderList.get(0).getTakeOffTime();
         Mp mp1 = doubleMpByFlightNoOrderList.get(0);
+        //筛选出双机长和多机长航班添加进去
         for (Mp mp : doubleMpByFlightNoOrderList
         ) {
-            if (!doubleFlightNo.equals(mp.getFlightNo()))
-                if (!doubleFlightNo.equals(mp.getFlightNo())) {
-                    doubleFlightNo = mp.getFlightNo();
-                    if (count == 2)
-                        doubleMpList.add(mp1);
-                    if (count >= 3)
-                        moreMpList.add(mp1);
-                    mp1 = mp;
-                    count = 0;
-                }
+            if (!doubleFlightNo.equals(mp.getFlightNo()) || !takeOffTime.equals(mp.getTakeOffTime()) || !mp.getProperty().equals("正班") ) {
+                doubleFlightNo = mp.getFlightNo();
+                takeOffTime = mp.getTakeOffTime();
+                if (count == 2)
+                    doubleMpList.add(mp1);
+                if (count >= 3)
+                    moreMpList.add(mp1);
+                mp1 = mp;
+                count = 0;
+            }
 
             if (!mp.getPost().substring(0, 1).equals("F") && !mp.getPost().substring(0, 1).equals("G") && mp.getProperty().equals("正班")) {
                 count++;
             }
         }
-
+        //对双机长航班进行排位
         for (Mp mp : doubleMpList
         ) {
             boolean isFlag = true;
@@ -217,8 +220,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             doubleFlight.setTcc(mp.getTcc());
             Map<String, String> captainMap = new HashMap<>();
             Map<Integer, String> orderMap = new HashMap<>();
-
-            List<Mp> flightNoMpList = mpRepository.findByFlightNo(mp.getDate(), mp.getFlightNo(), mp.getType());
+            List<Mp> flightNoMpList = mpRepository.findByDateAndFlightNoAndType(mp.getDate(), mp.getFlightNo(), mp.getType(),mp.getTakeOffTime());
             for (Mp eachMp : flightNoMpList
             ) {
                 if (eachMp.getPost().substring(0, 1).equals("F") || eachMp.getPost().substring(0, 1).equals("G"))
@@ -284,7 +286,6 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                     }
                 }
 
-            System.out.println(doubleFlight);
             if (doubleFlight.getFlightCombine() == null)
                 continue;
             if (doubleFlight.getFlightCombine().equals("JJ") || doubleFlight.getFlightCombine().contains("C"))
@@ -295,9 +296,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
 
             doubleFlightList.add(doubleFlight);
         }
-
         doubleFlightRepository.saveAll(doubleFlightList);
-
         for (
                 Mp mp : moreMpList
         ) {
@@ -318,7 +317,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             doubleFlight.setTcc(mp.getTcc());
             Map<String, String> captainMap = new HashMap<>();
             Map<Integer, String> orderMap = new HashMap<>();
-            List<Mp> flightNoMpList = mpRepository.findByFlightNo(mp.getDate(), mp.getFlightNo(), mp.getType());
+            List<Mp> flightNoMpList = mpRepository.findByDateAndFlightNoAndType(mp.getDate(), mp.getFlightNo(), mp.getType(),mp.getTakeOffTime());
             for (Mp eachMp : flightNoMpList
             ) {
                 if (eachMp.getPost().substring(0, 1).equals("F") || eachMp.getPost().substring(0, 1).equals("G"))
@@ -368,6 +367,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                 }
                 index++;
             }
+
             if (cadreStatus != null)
                 if (cadreDate.equals(doubleFlightBasic.getDate()) && cadreNo.equals(doubleFlightBasic.getNo())) {
                     doubleFlight.setCadre(cadre);
@@ -396,11 +396,10 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
 
             doubleFlight.setIsMore(true);
             doubleFlightRepository.save(doubleFlight);
-
         }
 
-
-        map.put("msg", "双机长航班表已生成");
+        doubleFlightRepository.updateMChangeToJStatus("未更改");
+        map.put("msg", "双(多)机长航班表已生成");
         return map;
     }
 
@@ -441,7 +440,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             if (doubleFlight.getFifthQualification() != null)
                 select = 5;
         }
-        List<String> propertiesList = doubleFlightRepository.propertiesList();
+        List<String> propertiesList = doubleFlightRepository.findAllProperty();
         model.addAttribute("doubleFlightList", doubleFlightList);
         model.addAttribute("count", count);
         model.addAttribute("propertiesList", propertiesList);
@@ -460,7 +459,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                 count--;
             }
         }
-        List<String> propertiesList = doubleFlightRepository.propertiesList();
+        List<String> propertiesList = doubleFlightRepository.findAllProperty();
         model.addAttribute("doubleFlightList", doubleFlightList);
         model.addAttribute("count", count);
         model.addAttribute("propertiesList", propertiesList);
@@ -498,7 +497,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
         int id = Integer.parseInt(request.getParameter("id"));
         DoubleFlight doubleFlight = doubleFlightRepository.findById(id).orElse(null);
         HashMap<String, Object> map = new HashMap<>();
-        if (doubleFlightRepository.getFlConfirm().equals("已确认")) {
+        if (doubleFlightRepository.findByFlConfirm().equals("已确认")) {
             //飞行部修改
             if (doubleFlight != null & department.equals("飞行")) {
                 String recorder = "";
@@ -537,7 +536,10 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                 doubleFlight.setDoubleLine(request.getParameter("doubleLine"));
                 doubleFlight.setNightFlight(request.getParameter("nightFlight"));
                 doubleFlight.setStageDoubleFlight(request.getParameter("stageDoubleFlight"));
-                doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
+                if(request.getParameter("flightCheck").equals(""))
+                    doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
+                if(request.getParameter("cadre").equals(""))
+                    doubleFlight.setCadre(request.getParameter("cadre"));
                 if (doubleFlight.getFlightCheck() != null) {
                     if (request.getParameter("checkSelect1") != null) {
                         doubleFlight.setAirChangeRecord(doubleFlight.getAirChangeRecord() + "资质1：" + doubleFlight.getFirstQualification() + "修改为C飞行检查员;");
@@ -589,7 +591,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             }
 
             //人力部修改
-            if (doubleFlightRepository.getAirConfirm().equals("已确认")) {
+            if (doubleFlightRepository.findByAirConfirm().equals("已确认")) {
                 if (doubleFlight != null & department.equals("人力")) {
                     String recorder = "";
                     if (!doubleFlight.getFirstQualification().equals(request.getParameter("firstQualification")))
@@ -626,7 +628,12 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                     doubleFlight.setDoubleLine(request.getParameter("doubleLine"));
                     doubleFlight.setNightFlight(request.getParameter("nightFlight"));
                     doubleFlight.setStageDoubleFlight(request.getParameter("stageDoubleFlight"));
-                    doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
+
+                    if(request.getParameter("flightCheck").equals(""))
+                        doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
+                    if(request.getParameter("cadre").equals(""))
+                        doubleFlight.setCadre(request.getParameter("cadre"));
+
                     if (doubleFlight.getFlightCheck() != null) {
                         if (request.getParameter("checkSelect1") != null) {
                             doubleFlight.setMpChangeRecord(doubleFlight.getMpChangeRecord() + "资质1：" + doubleFlight.getFirstQualification() + "修改为C飞行检查员;");
@@ -709,7 +716,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             return map;
         }
 
-        if (doubleFlightRepository.getFlConfirm().equals("已确认")) {
+        if (doubleFlightRepository.findByFlConfirm().equals("已确认")) {
             //飞行部修改
             if (doubleFlight != null & department.equals("飞行")) {
                 String recorder = "";
@@ -727,7 +734,10 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                 doubleFlight.setDoubleLine(request.getParameter("doubleLine"));
                 doubleFlight.setNightFlight(request.getParameter("nightFlight"));
                 doubleFlight.setStageDoubleFlight(request.getParameter("stageDoubleFlight"));
-                doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
+                if(request.getParameter("flightCheck").equals(""))
+                    doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
+                if(request.getParameter("cadre").equals(""))
+                    doubleFlight.setCadre(request.getParameter("cadre"));
                 if (doubleFlight.getFlightCheck() != null) {
                     if (request.getParameter("checkSelect1") != null) {
                         doubleFlight.setAirChangeRecord(doubleFlight.getAirChangeRecord() + "资质1：" + doubleFlight.getFirstQualification() + "修改为C飞行检查员;");
@@ -752,7 +762,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             }
 
             //人力部修改
-            if (doubleFlightRepository.getAirConfirm().equals("已确认")) {
+            if (doubleFlightRepository.findByAirConfirm().equals("已确认")) {
                 if (doubleFlight != null & department.equals("人力")) {
                     String recorder = "";
                     if (!doubleFlight.getFirstQualification().equals(request.getParameter("firstQualification")))
@@ -768,7 +778,10 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                     doubleFlight.setDoubleLine(request.getParameter("doubleLine"));
                     doubleFlight.setNightFlight(request.getParameter("nightFlight"));
                     doubleFlight.setStageDoubleFlight(request.getParameter("stageDoubleFlight"));
-                    doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
+                    if(request.getParameter("flightCheck").equals(""))
+                        doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
+                    if(request.getParameter("cadre").equals(""))
+                        doubleFlight.setCadre(request.getParameter("cadre"));
                     if (doubleFlight.getFlightCheck() != null) {
                         if (request.getParameter("checkSelect1") != null) {
                             doubleFlight.setMpChangeRecord(doubleFlight.getMpChangeRecord() + "资质1：" + doubleFlight.getFirstQualification() + "修改为C飞行检查员;");
@@ -804,28 +817,28 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
     public void confirm(HttpServletRequest request) {
         String department = (String) request.getSession().getAttribute("department");
         if (department.equals("飞行"))
-            doubleFlightRepository.airConfirm();
+            doubleFlightRepository.updateAirConfirm("已确认");
         if (department.equals("财务"))
-            doubleFlightRepository.flConfirm();
+            doubleFlightRepository.updateFlConfirm("已确认");
         if (department.equals("人力"))
-            doubleFlightRepository.mpConfirm();
+            doubleFlightRepository.updateMpConfirm("已确认");
     }
 
     @Override
     public void cancelConfirm(HttpServletRequest request) {
         String department = (String) request.getSession().getAttribute("department");
         if (department.equals("飞行"))
-            doubleFlightRepository.cancelAirConfirm();
+            doubleFlightRepository.updateAirConfirm("未确认");
         if (department.equals("财务"))
-            doubleFlightRepository.cancelFlConfirm();
+            doubleFlightRepository.updateFlConfirm("未确认");
         if (department.equals("人力"))
-            doubleFlightRepository.cancelMpConfirm();
+            doubleFlightRepository.updateMpConfirm("未确认");
     }
 
     @Override
     public Map<String, Object> downloadJudge() {
         HashMap<String, Object> map = new HashMap<>();
-        if (doubleFlightRepository.getAirConfirm().equals("已确认") & doubleFlightRepository.getFlConfirm().equals("已确认") & doubleFlightRepository.getMpConfirm().equals("已确认")) {
+        if (doubleFlightRepository.findByAirConfirm().equals("已确认") & doubleFlightRepository.findByFlConfirm().equals("已确认") & doubleFlightRepository.findByMpConfirm().equals("已确认")) {
             map.put("msg", "三部门已确认");
             return map;
         } else {
@@ -999,19 +1012,18 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
     public Map<String, Object> MtoJ() {
         Map<String, Object> map = new HashMap<>();
         try {
-            mpRepository.setPostMChangeToJ();
-            doubleFlightRepository.firstMtoJ();
-            doubleFlightRepository.secondMtoJ();
-            doubleFlightRepository.thirdMtoJ();
-            doubleFlightRepository.fourthMtoJ();
-            doubleFlightRepository.fifthMtoJ();
+            mpRepository.updatePost("J机长", "M见习机长");
+            doubleFlightRepository.updateFirstQualification("J机长(原为M见习机长)", "M见习机长");
+            doubleFlightRepository.updateSecondQualification("J机长(原为M见习机长)", "M见习机长");
+            doubleFlightRepository.updateThirdQualification("J机长(原为M见习机长)", "M见习机长");
+            doubleFlightRepository.updateFourthQualification("J机长(原为M见习机长)", "M见习机长");
+            doubleFlightRepository.updateFifthQualification("J机长(原为M见习机长)", "M见习机长");
             List<DoubleFlight> doubleFlightList = doubleFlightRepository.findAll();
             for (DoubleFlight doubleFlight : doubleFlightList
             ) {
@@ -1048,6 +1060,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             map.put("msg", "修改失败");
             return map;
         }
+        doubleFlightRepository.updateMChangeToJStatus("已更改");
         map.put("msg", "修改成功");
         return map;
     }

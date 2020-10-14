@@ -19,6 +19,7 @@ public class UserRealm extends AuthorizingRealm{
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection arg0) {
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         if(arg0.getPrimaryPrincipal().equals("系统管理员")){
+            info.addStringPermission("user:admin");
             info.addStringPermission("user:data");
             info.addStringPermission("user:update");
             info.addStringPermission("user:check");
@@ -52,15 +53,15 @@ public class UserRealm extends AuthorizingRealm{
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken arg0) throws AuthenticationException {
         UsernamePasswordToken token = (UsernamePasswordToken)arg0;
-        String userName = userRepository.getUserName(token.getUsername());
+        String userName = userRepository.findUserNameByLoginName(token.getUsername());
         String loginPwd = new String(token.getPassword());
-        String userPwd = userRepository.getUserPwd(userName,loginPwd);
+        String userPwd = userRepository.findUserPwdByLoginNameAndLoginPwd(userName,loginPwd);
         if(!token.getUsername().equals(userName)){
             return null;
         }
         if(!loginPwd.equals(userPwd))
             throw new IncorrectCredentialsException();
-        String department = userRepository.getDepartment(userName);
+        String department = userRepository.findDepartmentByLoginName(userName);
         return new SimpleAuthenticationInfo(department,userPwd,"");
     }
 

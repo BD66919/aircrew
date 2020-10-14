@@ -12,7 +12,6 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
@@ -27,7 +26,6 @@ public class CheckServiceImpl implements CheckService {
     private final MpRepository mpRepository;
     private final NextMpRepository nextMpRepository;
     private final CadreRepository cadreRepository;
-
 
     @Autowired
     CheckServiceImpl(MpRepository mpRepository, AirRepository airRepository, CadreRepository cadreRepository, LastAirRepository lastAirRepository, NextAirRepository nextAirRepository, LastMpRepository lastMpRepository, NextMpRepository nextMpRepository) {
@@ -98,13 +96,13 @@ public class CheckServiceImpl implements CheckService {
     }
 
     private List<Mp> getCheckResult() {
-        List<Mp> pilotListByOrder = mpRepository.findTransfer();
-        List<Air> airList = airRepository.getByDateSlideTimeEidSort();
+        List<Mp> pilotListByOrder = mpRepository.findByProperty("调组乘机乘车");
+        List<Air> airList = airRepository.findOrderByDateAndSlideTimeAndEid();
         for (Air air : airList
         ) {
             Mp mp = new Mp();
             mp.setDate(air.getDate());
-            mp.setTakeOffTime(air.getTakeOffTime()+":00");
+            mp.setTakeOffTime(air.getSlideTime()+":00");
             mp.setTcc(air.getDep() + "-" + air.getArr());
             mp.setEid(air.getEid());
             mp.setName(air.getName());
@@ -115,8 +113,8 @@ public class CheckServiceImpl implements CheckService {
 
         List<LastMp> lastMpTransferList = lastMpRepository.findByPropertyOrderByEidAndDateAndTakeOffTime("调组乘机乘车");
         List<NextMp> nextMpTransferList = nextMpRepository.findByPropertyOrderByEidAndDateAndTakeOffTime("调组乘机乘车");
-        List<LastAir> lastAirList = lastAirRepository.findOrderByEidAndDateAndTakeOffTime();
-        List<NextAir> nextAirList = nextAirRepository.findOrderByEidAndDateAndTakeOffTime();
+        List<LastAir> lastAirList = lastAirRepository.findOrderByEidAndDateAndSlideTime();
+        List<NextAir> nextAirList = nextAirRepository.findOrderByEidAndDateAndSlideTime();
         List<Air> lastOneMpList = new ArrayList<>();
         List<Air> nextOneMpList = new ArrayList<>();
         List<Mp> lastList = new ArrayList<>();
@@ -159,18 +157,12 @@ public class CheckServiceImpl implements CheckService {
             }
         }
 
-        for (Air mp: lastOneMpList
-             ) {
-            if(mp.getEid()==78088)
-                System.out.println(mp);
-        }
-
         //将air转化为mp
         for (Air air : lastOneMpList
         ) {
             Mp mp = new Mp();
             mp.setDate(air.getDate());
-            mp.setTakeOffTime(air.getTakeOffTime());
+            mp.setTakeOffTime(air.getSlideTime());
             mp.setTcc(air.getDep() + "-" + air.getArr());
             mp.setEid(air.getEid());
             mp.setName(air.getName());
@@ -183,7 +175,6 @@ public class CheckServiceImpl implements CheckService {
         String[] sortNameArr2 = new String[]{"eid", "date", "takeOffTime"};
         boolean[] isAscArr2 = {true, true, true};
         ListUtils.sort(lastList, sortNameArr2, isAscArr2);
-
 
         //上月取air和mp中的后一条
         for (int i = 0; i < lastList.size() - 1; i++) {
@@ -235,7 +226,7 @@ public class CheckServiceImpl implements CheckService {
         ) {
             Mp mp = new Mp();
             mp.setDate(air.getDate());
-            mp.setTakeOffTime(air.getTakeOffTime());
+            mp.setTakeOffTime(air.getSlideTime());
             mp.setTcc(air.getDep() + "-" + air.getArr());
             mp.setEid(air.getEid());
             mp.setName(air.getName());
@@ -322,6 +313,7 @@ public class CheckServiceImpl implements CheckService {
         cell.setCellStyle(cellStyle);
         cell.setCellValue(value);
     }
+
 
 
 }

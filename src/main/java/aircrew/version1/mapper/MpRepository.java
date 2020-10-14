@@ -11,25 +11,19 @@ import java.util.List;
 @Component
 public interface MpRepository extends JpaRepository<Mp,Integer> {
 
-    @Query(value = "select * from mp ORDER BY eid ,date ,takeOffTime",nativeQuery = true)
-    List<Mp> ByEidOrder();
+    @Query(value = "select * from mp ORDER BY date,flightNo,takeOffTime,property",nativeQuery = true)
+    List<Mp> findOrderByDateAndFlightNoAndTakeOffTimeAndProperty();
 
-    @Query(value = "select * from mp ORDER BY date,flightNo,takeOffTime",nativeQuery = true)
-    List<Mp> orderByFlightNo();
+    @Query(value = "select * from mp WHERE property=?1 ",nativeQuery = true)
+    List<Mp> findByProperty(String property);
 
-    @Query(value = "select * from mp WHERE eid=?1 ORDER BY date ,slideTime",nativeQuery = true)
-    List<Mp> findByEid(int eid);
-
-    @Query(value = "select * from mp WHERE property='调组乘机乘车' ",nativeQuery = true)
-    List<Mp> findTransfer();
-
-    @Query(value = "select * from mp WHERE date=?1 and flightNo=?2 and type=?3 ",nativeQuery = true)
-    List<Mp> findByFlightNo(String date,String flightNo,String type);
+    @Query(value = "select * from mp WHERE date=?1 and flightNo=?2 and type=?3 and takeOffTime=?4",nativeQuery = true)
+    List<Mp> findByDateAndFlightNoAndType(String date,String flightNo,String type,String takeOffTime);
 
     @Transactional
     @Modifying
-    @Query(value = "update mp as m set m.post='J机长' where m.post='M见习机长' ",nativeQuery = true)
-    void setPostMChangeToJ();
+    @Query(value = "update mp as m set m.post=?1 where m.post=?2 ",nativeQuery = true)
+    void updatePost(String newPost,String oldPost);
 
     @Transactional
     @Modifying
@@ -37,6 +31,6 @@ public interface MpRepository extends JpaRepository<Mp,Integer> {
     void truncateMp();
 
     @Query(value = "select * from mp order by id DESC limit 1",nativeQuery =  true)
-    Mp getLastMp();
+    Mp findOrderByIdDescLimit1();
 
 }

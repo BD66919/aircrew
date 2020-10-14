@@ -1,7 +1,6 @@
 package aircrew.version1.mapper;
 
 import aircrew.version1.entity.LastMp;
-import aircrew.version1.entity.Mp;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,8 +20,5 @@ public interface LastMpRepository extends JpaRepository<LastMp,Integer> {
     @Modifying
     @Query(value = "truncate table last_mp",nativeQuery = true)
     void truncateLastMp();
-
-    @Query(value = "select * from last_mp WHERE property='调组乘机乘车' ",nativeQuery = true)
-    List<LastMp> findByProperty();
 
 }

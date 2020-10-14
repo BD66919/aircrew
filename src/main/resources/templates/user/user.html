@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="http://www.airchina.com.cn/favicon.ico"/>
-    <title>过夜航班号查看</title>
+    <title>用户管理</title>
     <link href="/aircrew/static/asserts/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
           rel="stylesheet">
@@ -33,28 +33,24 @@
             <div class="container-fluid">
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">过夜航班号查看</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">用户管理</h6>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                 <tr>
-                                    <th>过夜航班号</th>
-                                    <th>备注</th>
+                                    <th>用户名</th>
+                                    <th>部门</th>
                                     <th>操作</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr th:each="nightflight:${nightFlightList}">
-                                    <td th:text="${nightflight.number}"></td>
-                                    <td th:text="${nightflight.remarks}"></td>
+                                <tr th:each="user:${userList}">
+                                    <td th:text="${user.userName}"></td>
+                                    <td th:text="${user.department}"></td>
                                     <td>
-                                        <button class="btn-sm btn-primary" data-toggle="modal" data-target="#edit"
-                                                th:data-number="${nightflight.number}"
-                                                th:data-remarks="${nightflight.remarks}">编辑
-                                        </button>
-                                        <button th:attr="del_uri=@{/deleteNightFlight=}+${nightflight.number}"
+                                        <button th:attr="del_uri=@{/deleteUser=}+${user.id}"
                                                 class="btn btn-sm btn-danger deleteBtn">删除
                                         </button>
                                     </td>
@@ -62,12 +58,15 @@
                                 </tbody>
                             </table>
                         </div>
-                        <p><a style="display:block;position:absolute;left:2%;color:grey"
-                              href="/aircrew/data/data.html">返回</a>
-                        </p>
-                        <div style="text-align: center">
-                            <p>共 <span th:text="${number}"></span> 趟过夜航班</p>
+                        <div>
+                            <button class="btn-lg btn-primary " data-toggle="modal" data-target="#addUser"
+                                    aria-haspopup="true" aria-expanded="false">
+                                新增
+                            </button>
                         </div>
+                        <form id="deleteUserForm" method="post">
+                            <input type="hidden" name="_method" value="delete"/>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -86,76 +85,77 @@
     </div>
 </div>
 
-<div class="modal fade" id="edit" tabindex="-1" role="dialog" aria-labelledby="addUpLabel" aria-hidden="true">
+<div class="modal fade" id="addUser" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-body">
-                <div class="form-group" align="left">
-                    <label for="number">过夜航班号（不可修改）</label>
-                    <input type="text" class="form-control" id="number" name="number" placeholder="过夜航班号"
-                           readonly="readonly"/>
+                <div class="form-group">
+                    <label for="name">账号名</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="账号名"/>
                 </div>
 
-                <div class="form-group" align="left">
-                    <label for="remarks">备注</label>
-                    <input type="text" class="form-control" id="remarks" name="remarks" placeholder="备注"/>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="text" class="form-control" id="password" name="password" placeholder="账号密码"/>
                 </div>
-                <span id="nightFlightStatus" style="color: red"></span>
+
+                <div class="form-group">
+                    <label for="department">部门</label>
+                    <select class="form-control" id="department" name="department">
+                        <option value="人力">人力</option>
+                        <option value="飞行">飞行</option>
+                        <option value="财务">财务</option>
+                        <option value="系统管理员">系统管理员</option>
+                    </select>
+                </div>
                 <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
-                <button type="submit" class="btn btn-success" id="updateNightFlightSubmit" th:text="修改"></button>
+                <button type="submit" class="btn btn-success" id="addUserSubmit" th:text="添加"></button>
+                <span id="userStatus" style="color: red"></span>
             </div>
         </div>
     </div>
-    <form id="deleteNightFlightForm" method="post">
-        <input type="hidden" name="_method" value="delete"/>
-    </form>
 </div>
 
 
 </body>
-<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
-<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script>
-    $('#edit').on("show.bs.modal", function (e) {
-        var number = $(e.relatedTarget).data("number");
-        var remarks = $(e.relatedTarget).data("remarks");
-        var modal = $(this);
-        modal.find('#number').val(number);
-        modal.find('#remarks').val(remarks);
-    });
 
-    $('#updateNightFlightSubmit').click(function () {
-        var number = document.getElementById("number").value;
-        var remarks = document.getElementById("remarks").value;
-        $.ajax({
-            type: "post",
-            url: "/aircrew/updateNightFlight",
-            data: {
-                number: number,
-                remarks: remarks
-            },
-            dataType: "json",
-            success: function (data) {
-                var msg = data.msg;
-                if (msg === "修改成功")
-                    $('#nightFlightStatus').css('color', 'green');
-                else
-                    $('#nightFlightStatus').css('color', 'red');
-                $('#nightFlightStatus').html(msg);
-                self.setInterval(function () {  // 这个方法是说在延迟两秒后执行大括号里的方法
-                    location.reload(true);   // 这个方法是刷新当前页面
-                }, 2000)
-            }
-        })
+    $(function () {
+        $('#addUserSubmit').click(function () {
+            var name = document.getElementById("name").value;
+            var password = document.getElementById("password").value;
+            var department = document.getElementById("department").value;
+            $.ajax({
+                type: "post",
+                url: "/aircrew/addUser",
+                data: {
+                    name: name,
+                    password: password,
+                    department: department
+                },
+                dataType: "json",
+                success: function (data) {
+                    var msg = data.msg;
+                    if (msg === "添加成功")
+                        $('#userStatus').css('color', 'green');
+                    else
+                        $('#userStatus').css('color', 'red');
+                    $('#userStatus').html(msg);
+                    self.setInterval(function () {  // 这个方法是说在延迟两秒后执行大括号里的方法
+                        location.reload();   // 这个方法是刷新当前页面
+                    }, 2000)
+
+                }
+            })
+        });
     });
 
     $(".deleteBtn").click(function () {
         if (confirm('确认删除?')) {
-            $("#deleteNightFlightForm").attr("action", $(this).attr("del_uri")).submit();
+            $("#deleteUserForm").attr("action", $(this).attr("del_uri")).submit();
         } else
             return false;
     })
-
 
 </script>
 </html>

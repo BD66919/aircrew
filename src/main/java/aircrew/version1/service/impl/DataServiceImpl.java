@@ -4,6 +4,7 @@ import aircrew.version1.entity.*;
 import aircrew.version1.mapper.*;
 import aircrew.version1.service.DataService;
 import aircrew.version1.utils.*;
+import com.google.common.collect.Lists;
 import lombok.Data;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -155,13 +156,18 @@ public class DataServiceImpl implements DataService {
                     }
                 } else {
                     if (!fl.getAirline().contains(air.getDep() + "-" + air.getArr())) {
-                        airResult.setDep(fl.getDep());
-                        airResult.setArr(fl.getArr());
+                        if (airResult.getDate().equals("2020-01-17") && airResult.getFlightNo().equals("4370"))
+                            System.out.println(airResult);
+                        System.out.println(fl.getAirline());
+                        airResult.setDep("财务:" + fl.getAirline() + " 飞行:" + air.getDep() + "-" + air.getArr());
+                        airResult.setArr("财务:" + fl.getAirline() + " 飞行:" + air.getDep() + "-" + air.getArr());
                         flag = true;
                     }
                 }
             }
             if (flag) {
+//                if(airResult.getDate().equals("2020-01-17") && airResult.getFlightNo().equals("4370"))
+//                    System.out.println(airResult);
                 airResultList.add(airResult);
             }
             if (!appear) {
@@ -246,7 +252,7 @@ public class DataServiceImpl implements DataService {
     }
 
     HashMap<String, Object> getAirMpCompareList() throws ParseException {
-        List<Air> airList = airRepository.getByDateSlideTimeEidSort();
+        List<Air> airList = airRepository.findOrderByDateAndSlideTimeAndEid();
         List<Mp> mpList = mpRepository.findAll();
         List<Mp> mpResultList = new ArrayList<>();
         long airCount = airRepository.count();
@@ -314,7 +320,7 @@ public class DataServiceImpl implements DataService {
                 }
             }
 
-            //结果的航线中可能存在重复的出发地/到达地，需要去除
+            //结果的航线中出发地/到达地可能在一个位置出现两次，需要去除
             String[] tcc = airLine.toString().split("-");
             StringBuilder tccAmend = new StringBuilder();
             for (int sub = 0; sub < tcc.length; sub++) {
@@ -326,6 +332,8 @@ public class DataServiceImpl implements DataService {
                     tccAmend.append("-").append(tcc[sub]);
             }
 
+
+            //添加进tcc
             if (!tccAmend.toString().equals(mp.getTcc())) {
                 if (result.getDate() != null) {
                     //为训练等杂数据时
@@ -444,16 +452,16 @@ public class DataServiceImpl implements DataService {
                     List<Air> yesterdayAirCheckList = airRepository.findByDateAndFlightNoAndEidAndFlightNumberOrderBySlideTime(yesterday, flightNo, mp.getEid(), flightNumber);
                     if (yesterdayAirCheckList.isEmpty()) {
                         yesterdayAirCheckList = airRepository.findByDateAndFlightNoAndEidAndFlightNumberOrderBySlideTime(yesterday, flightNo, mp.getEid(), "B" + flightNumber);
-                        if(yesterdayAirCheckList.isEmpty())
-                            yesterdayAirCheckList = airRepository.findByDateAndEidLikeFlightNoOrderBySlideTime(yesterday,mp.getEid(),flightNo);
+                        if (yesterdayAirCheckList.isEmpty())
+                            yesterdayAirCheckList = airRepository.findByDateAndEidLikeFlightNoOrderBySlideTime(yesterday, mp.getEid(), flightNo);
                     }
 
                     //今天
                     List<Air> todayAirCheckList = airRepository.findByDateAndFlightNoAndEidAndFlightNumberOrderBySlideTime(mp.getDate(), flightNo, mp.getEid(), flightNumber);
-                    if(todayAirCheckList.isEmpty()){
-                        todayAirCheckList = airRepository.findByDateAndFlightNoAndEidAndFlightNumberOrderBySlideTime(mp.getDate(),flightNo,mp.getEid(),"B" + flightNumber);
-                        if(todayAirCheckList.isEmpty())
-                            todayAirCheckList = airRepository.findByDateAndEidLikeFlightNoOrderBySlideTime(mp.getDate(),mp.getEid(),flightNo);
+                    if (todayAirCheckList.isEmpty()) {
+                        todayAirCheckList = airRepository.findByDateAndFlightNoAndEidAndFlightNumberOrderBySlideTime(mp.getDate(), flightNo, mp.getEid(), "B" + flightNumber);
+                        if (todayAirCheckList.isEmpty())
+                            todayAirCheckList = airRepository.findByDateAndEidLikeFlightNoOrderBySlideTime(mp.getDate(), mp.getEid(), flightNo);
                     }
 
                     //后一天
@@ -479,29 +487,33 @@ public class DataServiceImpl implements DataService {
                     List<Air> tomorrowAirCheckList = airRepository.findByDateAndFlightNoAndEidAndFlightNumberOrderBySlideTime(tomorrow, flightNo, mp.getEid(), flightNumber);
                     if (tomorrowAirCheckList.isEmpty()) {
                         tomorrowAirCheckList = airRepository.findByDateAndFlightNoAndEidAndFlightNumberOrderBySlideTime(tomorrow, flightNo, mp.getEid(), "B" + flightNumber);
-                        if(tomorrowAirCheckList.isEmpty())
-                            tomorrowAirCheckList = airRepository.findByDateAndEidLikeFlightNoOrderBySlideTime(tomorrow,mp.getEid(),flightNo);
+                        if (tomorrowAirCheckList.isEmpty())
+                            tomorrowAirCheckList = airRepository.findByDateAndEidLikeFlightNoOrderBySlideTime(tomorrow, mp.getEid(), flightNo);
                     }
+
                     for (Air air : yesterdayAirCheckList) {
                         if (airTccCheck == null) {
                             airTccCheck = air.getDep() + ("-") + air.getArr();
-                        } else
+                        } else if (!airTccCheck.substring(airTccCheck.length() - 3).equals(air.getArr()))
                             airTccCheck = air.getDep() + ("-") + airTccCheck;
                     }
+
 
                     for (Air air : todayAirCheckList) {
                         if (airTccCheck == null) {
                             airTccCheck = air.getDep() + ("-") + air.getArr();
-                        } else
+                        } else if (!airTccCheck.substring(airTccCheck.length() - 3).equals(air.getArr()))
                             airTccCheck = airTccCheck + ("-") + air.getArr();
                     }
+
 
                     for (Air air : tomorrowAirCheckList) {
                         if (airTccCheck == null) {
                             airTccCheck = air.getDep() + ("-") + air.getArr();
-                        } else
+                        } else if (!airTccCheck.substring(airTccCheck.length() - 3).equals(air.getArr()))
                             airTccCheck = airTccCheck + "-" + air.getArr();
                     }
+
                     firstFlightNo = flightNo;
                 }
 
@@ -513,15 +525,91 @@ public class DataServiceImpl implements DataService {
                     } else
                         mp.setTcc("飞行：" + airTccCheck + " 人力：" + mpTcc.substring(3));
             }
-
         }
-
         HashMap<String, Object> map = new HashMap<>();
         map.put("airCount", airCount);
         map.put("mpCount", mpCount);
         map.put("mpResultList", mpResultList);
         return map;
     }
+
+//    HashMap<String, Object> getAirMpCompareList() throws ParseException{
+//        HashMap<String, Object> map = new HashMap<>();
+//        List<Mp> mpList = mpRepository.findOrderByDateAndFlightNoAndTakeOffTimeAndProperty();
+//        //用于拆分人力数据
+//        List<Mp> mpSplitList = new ArrayList<>();
+//        List<Air> airList = airRepository.findOrderByDateAndSlideTimeAndEid();
+//        int airCount = (int)airRepository.count();
+//        int mpCount = 0;
+//        //拆分人力数据
+//        for (Mp mp: mpList
+//             ) {
+//            String[] flightNoList = mp.getFlightNo().split("/") ;
+//            mpCount = mpCount + flightNoList.length;
+//            for (int i =0;i<flightNoList.length;i++) {
+//                Mp mpSplit = new Mp(mp.getDate(),mp.getEid(),mp.getName(),mp.getTcc().substring(i*4,i*4+7),flightNoList[i],mp.getProperty(),
+//                        mp.getPost(),mp.getTakeOffTime(),mp.getType(),mp.getAirplaneNumber().replace("-",""));
+//                System.out.println(mpSplit);
+//                mpSplitList.add(mpSplit);
+//            }
+//        }
+//        List<Mp> mpResultList = new ArrayList<>();
+//
+//        int daysOfMonth = 27;
+//        int daysOfLastMonth = 1;
+//        if (!mpList.isEmpty()) {
+//            //获取本月天数
+//            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.setTime(simpleDateFormat.parse(mpList.get(0).getDate()));
+//            daysOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+//            //获取上月天数
+//            calendar.setTime(simpleDateFormat.parse(mpList.get(0).getDate().substring(0, 5) + "0" + String.valueOf(Integer.parseInt(mpList.get(0).getDate().substring(5, 7)) - 1) + "-01"));
+//            daysOfLastMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+//        }
+//
+//        //飞行与人力数据对比
+//        for(int i=0;i<airList.size();i++){
+//            Air air = airList.get(i);
+//            for(int j=0;j<mpSplitList.size();j++){
+//                Mp mp = mpSplitList.get(j);
+//                if(!air.getDate().equals(mp.getDate()) || air.getEid()!=mp.getEid() || !air.getFlightNo().equals(mp.getFlightNo()))
+//                    continue;
+//                if(!air.getTcc().equals(mp.getTcc())){
+//                    boolean flag = true;
+//                    for(int k=j;k<mpSplitList.size();k++){
+//                        Mp secondMp = mpSplitList.get(k);
+//                        if(air.getTcc().equals(secondMp.getTcc()) && air.getEid()==secondMp.getEid() && air.getFlightNo().equals(secondMp.getFlightNo()) && air.getDate().equals(secondMp.getDate())){
+//                            flag = false;
+//                            break;
+//                        }
+//                    }
+//                    if(flag){
+//                        Mp mpResult = new Mp(air.getDate(),air.getEid(),air.getName(),"飞行:"+air.getTcc()+"人力:"+mp.getTcc(),air.getFlightNo(),air.getProperty(),air.getQualify(),air.getTakeOffTime(),mp.getType(),mp.getAirplaneNumber());
+//                        mpResultList.add(mpResult);
+//                    }
+//                }
+//            }
+//        }
+//
+////        for (Air air: airList
+////             ) {
+////            for (Mp mp: mpSplitList
+////                 ) {
+////                if(!air.getDate().equals(mp.getDate()) || air.getEid()!=mp.getEid() || !air.getFlightNo().equals(mp.getFlightNo()))
+////                    continue;
+////                if(!air.getTcc().equals(mp.getTcc())) {
+////                    Mp mpResult = new Mp(mp.getDate(),mp.getEid(),mp.getName(),"飞行:"+air.getTcc()+"人力:"+mp.getTcc(),mp.getFlightNo(),mp.getProperty(),mp.getPost(),mp.getTakeOffTime(),mp.getType(),mp.getAirplaneNumber());
+////                    mpResultList.add(mpResult);
+////                }
+////            }
+////        }
+//
+//        map.put("airCount", airCount);
+//        map.put("mpCount", mpCount);
+//        map.put("mpResultList", mpResultList);
+//        return map;
+//    }
 
     private void cellValue(HSSFCellStyle cellStyle, HSSFRow row, int i, String value) {
         Cell cell = row.createCell(i);
@@ -543,12 +631,12 @@ public class DataServiceImpl implements DataService {
         Table flTable = new Table();
 
         LastAir lastLastAir = lastAirRepository.findOrderByIdDescLimit1();
-        Air lastAir = airRepository.getLastAir();
-        NextAir lastNextAir = nextAirRepository.getLastNextAir();
+        Air lastAir = airRepository.findOrderByIdDescLimit1();
+        NextAir lastNextAir = nextAirRepository.findOrderByIdDescLimit1();
         LastMp lastLastMp = lastMpRepository.findOrderByIdDescLimit1();
-        Mp lastMp = mpRepository.getLastMp();
+        Mp lastMp = mpRepository.findOrderByIdDescLimit1();
         NextMp lastNextMp = nextMpRepository.findByIdByDescByLimit1();
-        Fl lastFl = flRepository.getLastFl();
+        Fl lastFl = flRepository.findOrderByIdDescLimit1();
 
         if (lastLastAir != null) {
             lastAirTable.setState(lastLastAir.getDate() + " " + lastLastAir.getTakeOffTime() + " " + lastLastAir.getName() + " " + lastLastAir.getFlightNo());

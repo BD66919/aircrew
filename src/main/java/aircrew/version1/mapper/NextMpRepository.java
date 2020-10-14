@@ -1,6 +1,5 @@
 package aircrew.version1.mapper;
 
-import aircrew.version1.entity.Mp;
 import aircrew.version1.entity.NextMp;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -21,8 +20,4 @@ public interface NextMpRepository extends JpaRepository<NextMp, Integer> {
     @Modifying
     @Query(value = "truncate table next_mp", nativeQuery = true)
     void truncateNextMp();
-
-    @Query(value = "select * from next_mp WHERE property='调组乘机乘车' ", nativeQuery = true)
-    List<NextMp> findByProperty();
-
 }
