@@ -43,7 +43,7 @@ public interface DoubleFlightRepository extends JpaRepository<DoubleFlight,Integ
 
     @Transactional
     @Modifying
-    @Query(value = "update doubleFlight as d set d.firstQualification=?1 where d.firstQualification=?2",nativeQuery = true)
+    @Query(value = "update doubleFlight as d set d.firstQualification=?1 where d.firstQualification=?2 ",nativeQuery = true)
     void updateFirstQualification(String newQualification,String oldQualification);
 
     @Transactional

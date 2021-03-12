@@ -14,11 +14,11 @@
     <link href="/aircrew/static/asserts/css/sb-admin-2.min.css" rel="stylesheet">
     <link href="/aircrew/static/asserts/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
     <style>
-        th {
+        td {
             font-size: 1px;
         }
 
-        td {
+        th {
             font-size: 1px;
         }
     </style>
@@ -50,25 +50,25 @@
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                 <tr>
-                                    <th>起飞日期</th>
-                                    <th>航班号</th>
-                                    <th>航线名称</th>
-                                    <th>城市三字码</th>
+                                    <th>日期</th>
+                                    <th>航班</th>
+                                    <th>航线</th>
+                                    <th>三字码</th>
                                     <th>机组1</th>
                                     <th>资质1</th>
                                     <th>机组2</th>
                                     <th>资质2</th>
                                     <th>机组组合</th>
-                                    <th>双组航线检查</th>
+                                    <th>双组航线</th>
                                     <th>过夜航班</th>
                                     <th>阶段双组</th>
-                                    <th>C检查航线</th>
+                                    <th>检查航线</th>
                                     <th>飞行管理人员</th>
                                     <th>飞行部资质修改记录</th>
                                     <th>飞行部修改说明</th>
                                     <th>人力部资质修改记录</th>
                                     <th>人力部修改说明</th>
-                                    <th shiro:hasPermission="user:data">编辑</th>
+                                    <th shiro:hasAnyPermissions="user:fl,user:air,user:mp">操作</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -88,12 +88,12 @@
                                     <td th:text="${doubleFlight.flightCheck}"></td>
                                     <td th:text="${doubleFlight.cadre}"></td>
                                     <td th:text="${doubleFlight.airChangeRecord}"></td>
-                                    <td th:text="${doubleFlight.airRemark}"
-                                    </td>
+                                    <td th:text="${doubleFlight.airRemark}"></td>
                                     <td th:text="${doubleFlight.mpChangeRecord}"></td>
                                     <td th:text="${doubleFlight.mpRemark}"></td>
-                                    <td shiro:hasPermission="user:data">
+                                    <td shiro:hasAnyPermissions="user:fl,user:air,user:mp">
                                         <button class="btn-small btn-primary" data-toggle="modal" data-target="#edit"
+                                                shiro:hasPermission="user:fl"
                                                 th:data-id="${doubleFlight.id}"
                                                 th:data-line="${doubleFlight.line}"
                                                 th:data-firstposition="${doubleFlight.firstPosition}"
@@ -104,8 +104,40 @@
                                                 th:data-nightflight="${doubleFlight.nightFlight}"
                                                 th:data-stagedoubleflight="${doubleFlight.stageDoubleFlight}"
                                                 th:data-flightcheck="${doubleFlight.flightCheck}"
-                                                th:data-cadre="${doubleFlight.cadre}">编辑
+                                                th:data-cadre="${doubleFlight.cadre}"
+                                                th:data-remark=null>修改
                                         </button>
+                                        <button class="btn-small btn-primary" data-toggle="modal" data-target="#edit"
+                                                shiro:hasPermission="user:air"
+                                                th:data-id="${doubleFlight.id}"
+                                                th:data-line="${doubleFlight.line}"
+                                                th:data-firstposition="${doubleFlight.firstPosition}"
+                                                th:data-firstqualification="${doubleFlight.firstQualification}"
+                                                th:data-secondposition="${doubleFlight.secondPosition}"
+                                                th:data-secondqualification="${doubleFlight.secondQualification}"
+                                                th:data-doubleline="${doubleFlight.doubleLine}"
+                                                th:data-nightflight="${doubleFlight.nightFlight}"
+                                                th:data-stagedoubleflight="${doubleFlight.stageDoubleFlight}"
+                                                th:data-flightcheck="${doubleFlight.flightCheck}"
+                                                th:data-cadre="${doubleFlight.cadre}"
+                                                th:data-remark="${doubleFlight.airRemark}">修改
+                                        </button>
+                                        <button class="btn-small btn-primary" data-toggle="modal" data-target="#edit"
+                                                shiro:hasPermission="user:mp"
+                                                th:data-id="${doubleFlight.id}"
+                                                th:data-line="${doubleFlight.line}"
+                                                th:data-firstposition="${doubleFlight.firstPosition}"
+                                                th:data-firstqualification="${doubleFlight.firstQualification}"
+                                                th:data-secondposition="${doubleFlight.secondPosition}"
+                                                th:data-secondqualification="${doubleFlight.secondQualification}"
+                                                th:data-doubleline="${doubleFlight.doubleLine}"
+                                                th:data-nightflight="${doubleFlight.nightFlight}"
+                                                th:data-stagedoubleflight="${doubleFlight.stageDoubleFlight}"
+                                                th:data-flightcheck="${doubleFlight.flightCheck}"
+                                                th:data-cadre="${doubleFlight.cadre}"
+                                                th:data-remark="${doubleFlight.mpRemark}">修改
+                                        </button>
+
                                     </td>
                                 </tr>
                                 </tbody>
@@ -113,22 +145,12 @@
                         </div>
                         <div style="text-align: center">
                             <p><a style="display:block;position:absolute;left:2%;color:grey"
-                                  href="/aircrew/doubleFlight/flight.html">返回</a>共 <span th:text="${count}"></span> 条数据</p>
+                                  href="/aircrew/doubleFlight/flight.html">返回</a>共 <span th:text="${count}"></span> 条数据
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- /.container-fluid -->
-            <!-- Bootstrap core JavaScript-->
-            <script th:src="@{/static/asserts/vendor/jquery/jquery.min.js}"></script>
-            <script th:src="@{/static/asserts/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
-
-            <!-- Core plugin JavaScript-->
-            <script th:src="@{/static/asserts/vendor/jquery-easing/jquery.easing.min.js}"></script>
-
-            <!-- Custom scripts for all pages-->
-            <script th:src="@{/static/asserts/js/sb-admin-2.min.js}"></script>
-            <script th:src="@{/static/asserts/js/data.js}"></script>
         </div>
     </div>
 </div>
@@ -148,17 +170,23 @@
                     <label for="firstPosition">机组1</label>
                     <input type="text" class="form-control" id="firstPosition" name="firstPosition"/>
                 </div>
-                <div class="form-group" align="left">
-                    <label for="firstQualification">资质1</label>
-                    <input type="text" class="form-control" id="firstQualification" name="firstQualification"/>
+                <div class="form-group">
+                    <label for="firstQualification">资质1(若资质为空，请在主页面添加当前机组资质即可）</label>
+                    <br>
+                    <select class="form-control" id="firstQualification">
+                        <option th:each="result:${propertiesList}" th:text="${result}"></option>
+                    </select>
                 </div>
                 <div class="form-group" align="left">
                     <label for="secondPosition">机组2</label>
                     <input type="text" class="form-control" id="secondPosition" name="secondPosition"/>
                 </div>
-                <div class="form-group" align="left">
-                    <label for="secondQualification">资质2</label>
-                    <input type="text" class="form-control" id="secondQualification" name="secondQualification"/>
+                <div class="form-group">
+                    <label for="secondQualification">资质2(若资质为空，请在主页面添加当前机组资质即可）</label>
+                    <br>
+                    <select class="form-control" id="secondQualification">
+                        <option th:each="result:${propertiesList}" th:text="${result}"></option>
+                    </select>
                 </div>
                 <div class="form-group" align="left">
                     <label for="doubleLine">双组航线检查</label>
@@ -175,24 +203,57 @@
                 </div>
                 <div class="form-group" align="left">
                     <label for="flightCheck">C检查航线</label>
+                    <label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input name="checkSelect1" type="checkbox" value="1">
+                        机组1
+                    </label>
+                    <label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input name="checkSelect2" type="checkbox" value="2">
+                        机组2
+                    </label>
                     <input type="text" class="form-control" id="flightCheck" name="flightCheck"/>
                 </div>
                 <div class="form-group" align="left">
                     <label for="cadre">飞行管理人员</label>
+                    <label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input name="cadreSelect1" type="checkbox" value="1">
+                        机组1
+                    </label>
+                    <label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input name="cadreSelect2" type="checkbox" value="2">
+                        机组2
+                    </label>
                     <input type="text" class="form-control" id="cadre" name="cadre"/>
                 </div>
-
+                <div class="form-group" align="left" shiro:hasAnyPermissions="user:air,user:mp" >
+                    <label for="remarks">修改说明</label>
+                    <input type="text" class="form-control" id="remarks" name="remarks"/>
+                </div>
                 <span id="doubleFlightStatus" style="color: red"></span>
                 <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
-                <button type="submit" class="btn btn-success" id="updateDoubleFlightSubmit" th:text="修改"></button>
+                <button type="submit" class="btn btn-success" id="updateDoubleFlightSubmit"
+                        th:text="修改"></button>
             </div>
         </div>
     </div>
 </div>
 </body>
 
-<script>
+<!-- /.container-fluid -->
+<!-- Bootstrap core JavaScript-->
+<script th:src="@{/static/asserts/vendor/jquery/jquery.min.js}"></script>
 
+<script th:src="@{/static/asserts/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+<!-- Core plugin JavaScript-->
+<script th:src="@{/static/asserts/vendor/jquery-easing/jquery.easing.min.js}"></script>
+
+<!-- Custom scripts for all pages-->
+<script th:src="@{/static/asserts/js/sb-admin-2.min.js}"></script>
+
+<script th:src="@{/static/asserts/js/data.js}"></script>
+
+<script>
     $('#edit').on("show.bs.modal", function (e) {
         var id = $(e.relatedTarget).data("id");
         var line = $(e.relatedTarget).data("line");
@@ -205,8 +266,8 @@
         var stageDoubleFlight = $(e.relatedTarget).data("stagedoubleflight");
         var flightCheck = $(e.relatedTarget).data("flightcheck");
         var cadre = $(e.relatedTarget).data("cadre");
+        var remark = $(e.relatedTarget).data("remark");
         var modal = $(this);
-
         modal.find('#id').val(id);
         modal.find('#line').val(line);
         modal.find('#firstPosition').val(firstPosition);
@@ -218,6 +279,7 @@
         modal.find('#stageDoubleFlight').val(stageDoubleFlight);
         modal.find('#flightCheck').val(flightCheck);
         modal.find('#cadre').val(cadre);
+        modal.find('#remarks').val(remark);
 
     });
 
@@ -233,7 +295,14 @@
         var stageDoubleFlight = document.getElementById("stageDoubleFlight").value;
         var flightCheck = document.getElementById("flightCheck").value;
         var cadre = document.getElementById("cadre").value;
-
+        if(document.getElementById("remarks"))
+            var remarks = document.getElementById("remarks").value;
+        else
+            var remarks = null;
+        var $checkSelect1 = jQuery("input[name='checkSelect1']:checked").val();
+        var $checkSelect2 = jQuery("input[name='checkSelect2']:checked").val();
+        var $cadreSelect1 = jQuery("input[name='cadreSelect1']:checked").val();
+        var $cadreSelect2 = jQuery("input[name='cadreSelect2']:checked").val();
         $.ajax({
             type: "post",
             url: "/aircrew/doubleFlight/updateDoubleFlight",
@@ -248,7 +317,12 @@
                 nightFlight: nightFlight,
                 stageDoubleFlight: stageDoubleFlight,
                 flightCheck: flightCheck,
-                cadre: cadre
+                cadre: cadre,
+                remarks: remarks,
+                checkSelect1: $checkSelect1,
+                checkSelect2: $checkSelect2,
+                cadreSelect1: $cadreSelect1,
+                cadreSelect2: $cadreSelect2
             },
             dataType: "json",
             success: function (data) {
@@ -260,7 +334,7 @@
                 $('#doubleFlightStatus').html(msg);
                 self.setInterval(function () {  // 这个方法是说在延迟两秒后执行大括号里的方法
                     location.reload(true);   // 这个方法是刷新当前页面
-                }, 3000);
+                }, 1500);
             }
         })
     });
@@ -284,6 +358,6 @@
             }
         }
     }
-
 </script>
+
 </html>

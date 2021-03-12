@@ -22,7 +22,7 @@ public interface MpRepository extends JpaRepository<Mp,Integer> {
 
     @Transactional
     @Modifying
-    @Query(value = "update mp as m set m.post=?1 where m.post=?2 ",nativeQuery = true)
+    @Query(value = "update mp as m set m.post=?1 where m.post=?2 and m.property='正班'",nativeQuery = true)
     void updatePost(String newPost,String oldPost);
 
     @Transactional

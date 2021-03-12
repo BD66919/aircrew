@@ -184,7 +184,7 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
         //筛选出双机长和多机长航班添加进去
         for (Mp mp : doubleMpByFlightNoOrderList
         ) {
-            if (!doubleFlightNo.equals(mp.getFlightNo()) || !takeOffTime.equals(mp.getTakeOffTime()) || !mp.getProperty().equals("正班") ) {
+            if (!doubleFlightNo.equals(mp.getFlightNo()) || !takeOffTime.equals(mp.getTakeOffTime()) || !mp.getProperty().equals("正班")) {
                 doubleFlightNo = mp.getFlightNo();
                 takeOffTime = mp.getTakeOffTime();
                 if (count == 2)
@@ -220,23 +220,24 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             doubleFlight.setTcc(mp.getTcc());
             Map<String, String> captainMap = new HashMap<>();
             Map<Integer, String> orderMap = new HashMap<>();
-            List<Mp> flightNoMpList = mpRepository.findByDateAndFlightNoAndType(mp.getDate(), mp.getFlightNo(), mp.getType(),mp.getTakeOffTime());
+            List<Mp> flightNoMpList = mpRepository.findByDateAndFlightNoAndType(mp.getDate(), mp.getFlightNo(), mp.getType(), mp.getTakeOffTime());
             for (Mp eachMp : flightNoMpList
             ) {
                 if (eachMp.getPost().substring(0, 1).equals("F") || eachMp.getPost().substring(0, 1).equals("G"))
                     continue;
-                if (cadreStatus != null)
+                if (cadreStatus != null) {
                     if (eachMp.getPost().equals("C飞行检查员"))
                         if (doubleFlight.getCadre() == null) {
                             doubleFlight.setFlightCheck("C检查航线");
                         }
-                for (Cadre cadre1 : cadreList
-                ) {
-                    if (eachMp.getEid() == cadre1.getEid()) {
-                        doubleFlight.setCadre(cadre1.getCategory());
-                        isFlag = false;
-                    }
+                    for (Cadre cadre1 : cadreList
+                    )
+                        if (eachMp.getEid() == cadre1.getEid()) {
+                            doubleFlight.setCadre(cadre1.getQualify());
+                            isFlag = false;
+                        }
                 }
+
 
                 List<Air> airList = airRepository.findByFlightNo(eachMp.getDate(), eachMp.getFlightNo().split("/")[0], eachMp.getEid());
                 if (airList.size() == 0)
@@ -317,20 +318,21 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             doubleFlight.setTcc(mp.getTcc());
             Map<String, String> captainMap = new HashMap<>();
             Map<Integer, String> orderMap = new HashMap<>();
-            List<Mp> flightNoMpList = mpRepository.findByDateAndFlightNoAndType(mp.getDate(), mp.getFlightNo(), mp.getType(),mp.getTakeOffTime());
+            List<Mp> flightNoMpList = mpRepository.findByDateAndFlightNoAndType(mp.getDate(), mp.getFlightNo(), mp.getType(), mp.getTakeOffTime());
             for (Mp eachMp : flightNoMpList
             ) {
                 if (eachMp.getPost().substring(0, 1).equals("F") || eachMp.getPost().substring(0, 1).equals("G"))
                     continue;
-                if (cadreStatus != null)
+                if (cadreStatus != null) {
                     if (eachMp.getPost().equals("C飞行检查员"))
                         if (doubleFlight.getCadre() == null) {
                             doubleFlight.setFlightCheck("C检查航线");
                         }
-                for (Cadre cadre1 : cadreList
-                ) {
-                    if (eachMp.getEid() == cadre1.getEid()) {
-                        doubleFlight.setCadre(cadre1.getCategory());
+                    for (Cadre cadre1 : cadreList
+                    ) {
+                        if (eachMp.getEid() == cadre1.getEid()) {
+                            doubleFlight.setCadre(cadre1.getQualify());
+                        }
                     }
                 }
                 List<Air> airList = airRepository.findByFlightNo(eachMp.getDate(), eachMp.getFlightNo().split("/")[0], eachMp.getEid());
@@ -414,8 +416,10 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                 count--;
             }
         }
+        List<String> propertiesList = doubleFlightRepository.findAllProperty();
         model.addAttribute("doubleFlightList", doubleFlightList);
         model.addAttribute("count", count);
+        model.addAttribute("propertiesList", propertiesList);
         return "doubleFlight/doubleFlight.html";
     }
 
@@ -468,10 +472,13 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
 
     @Override
     public Map<String, Object> updateDoubleFlight(HttpServletRequest request) {
+        String department = (String) request.getSession().getAttribute("department");
         int id = Integer.parseInt(request.getParameter("id"));
         DoubleFlight doubleFlight = doubleFlightRepository.findById(id).orElse(null);
         HashMap<String, Object> map = new HashMap<>();
-        if (doubleFlight != null) {
+        //财务部修改
+        if (department.equals("财务")) {
+            assert doubleFlight != null;
             doubleFlight.setLine(request.getParameter("line"));
             doubleFlight.setFirstPosition(request.getParameter("firstPosition"));
             doubleFlight.setFirstQualification(request.getParameter("firstQualification"));
@@ -487,7 +494,101 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
             map.put("msg", "修改成功");
             return map;
         }
-        map.put("msg", "修改失败");
+
+        if (doubleFlightRepository.findByFlConfirm().equals("已确认")) {
+            //飞行部修改
+            if (doubleFlight != null & department.equals("飞行")) {
+                String recorder = "";
+                //资质修改
+                if (!doubleFlight.getFirstQualification().equals(request.getParameter("firstQualification")))
+                    recorder = recorder.concat("资质1：" + doubleFlight.getFirstQualification() + "修改为" + request.getParameter("firstQualification")) + ";";
+                if (!doubleFlight.getSecondQualification().equals(request.getParameter("secondQualification")))
+                    recorder = recorder.concat("资质2：" + doubleFlight.getSecondQualification() + "修改为" + request.getParameter("secondQualification")) + ";";
+                doubleFlight.setAirChangeRecord(doubleFlight.getAirChangeRecord() + " " + recorder);
+                doubleFlight.setLine(request.getParameter("line"));
+                doubleFlight.setFirstPosition(request.getParameter("firstPosition"));
+                doubleFlight.setFirstQualification(request.getParameter("firstQualification"));
+                doubleFlight.setSecondPosition(request.getParameter("secondPosition"));
+                doubleFlight.setSecondQualification(request.getParameter("secondQualification"));
+                doubleFlight.setDoubleLine(request.getParameter("doubleLine"));
+                doubleFlight.setNightFlight(request.getParameter("nightFlight"));
+                doubleFlight.setStageDoubleFlight(request.getParameter("stageDoubleFlight"));
+                if (request.getParameter("flightCheck").equals(""))
+                    doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
+                if (request.getParameter("cadre").equals(""))
+                    doubleFlight.setCadre(request.getParameter("cadre"));
+                if (doubleFlight.getFlightCheck() != null) {
+                    if (request.getParameter("checkSelect1") != null) {
+                        doubleFlight.setAirChangeRecord(doubleFlight.getAirChangeRecord() + "资质1：" + doubleFlight.getFirstQualification() + "修改为C飞行检查员;");
+                        doubleFlight.setFirstQualification("C飞行检查员");
+                        doubleFlight.setFlightCheck("机组1检查航线");
+                    }
+                    if (request.getParameter("checkSelect2") != null) {
+                        doubleFlight.setAirChangeRecord(doubleFlight.getAirChangeRecord() + "资质2：" + doubleFlight.getSecondQualification() + "修改为C飞行检查员;");
+                        doubleFlight.setSecondQualification("C飞行检查员");
+                        doubleFlight.setFlightCheck(doubleFlight.getFlightCheck() + "机组2检查航线");
+                    }
+                }
+                if (request.getParameter("cadreSelect1") != null)
+                    doubleFlight.setCadre("1" + request.getParameter("cadre"));
+                if (request.getParameter("cadreSelect2") != null)
+                    doubleFlight.setCadre(doubleFlight.getCadre() + " " + "2" + request.getParameter("cadre"));
+                doubleFlight.setAirRemark(request.getParameter("remarks"));
+                doubleFlight.setFlightCombine(doubleFlight.getFirstQualification().substring(0, 1) + doubleFlight.getSecondQualification().substring(0, 1));
+                doubleFlightRepository.save(doubleFlight);
+                map.put("msg", "修改成功");
+                return map;
+            }
+
+            //人力部修改
+            if (doubleFlightRepository.findByAirConfirm().equals("已确认")) {
+                if (doubleFlight != null & department.equals("人力")) {
+                    String recorder = "";
+                    if (!doubleFlight.getFirstQualification().equals(request.getParameter("firstQualification")))
+                        recorder = recorder.concat("资质1：" + doubleFlight.getFirstQualification() + "修改为" + request.getParameter("firstQualification")) + ";";
+                    if (!doubleFlight.getSecondQualification().equals(request.getParameter("secondQualification")))
+                        recorder = recorder.concat("资质2：" + doubleFlight.getSecondQualification() + "修改为" + request.getParameter("secondQualification")) + ";";
+                    doubleFlight.setMpChangeRecord(doubleFlight.getMpChangeRecord() + " " + recorder);
+                    doubleFlight.setLine(request.getParameter("line"));
+                    doubleFlight.setFirstPosition(request.getParameter("firstPosition"));
+                    doubleFlight.setFirstQualification(request.getParameter("firstQualification"));
+                    doubleFlight.setSecondPosition(request.getParameter("secondPosition"));
+                    doubleFlight.setSecondQualification(request.getParameter("secondQualification"));
+                    doubleFlight.setDoubleLine(request.getParameter("doubleLine"));
+                    doubleFlight.setNightFlight(request.getParameter("nightFlight"));
+                    doubleFlight.setStageDoubleFlight(request.getParameter("stageDoubleFlight"));
+                    if (request.getParameter("flightCheck").equals(""))
+                        doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
+                    if (request.getParameter("cadre").equals(""))
+                        doubleFlight.setCadre(request.getParameter("cadre"));
+                    if (doubleFlight.getFlightCheck() != null) {
+                        if (request.getParameter("checkSelect1") != null) {
+                            doubleFlight.setMpChangeRecord(doubleFlight.getMpChangeRecord() + "资质1：" + doubleFlight.getFirstQualification() + "修改为C飞行检查员;");
+                            doubleFlight.setFirstQualification("C飞行检查员");
+                            doubleFlight.setFlightCheck("机组1检查航线");
+                        }
+                        if (request.getParameter("checkSelect2") != null) {
+                            doubleFlight.setMpChangeRecord(doubleFlight.getMpChangeRecord() + "资质2：" + doubleFlight.getSecondQualification() + "修改为C飞行检查员;");
+                            doubleFlight.setSecondQualification("C飞行检查员");
+                            doubleFlight.setFlightCheck(doubleFlight.getFlightCheck() + "机组2检查航线");
+                        }
+                    }
+                    if (request.getParameter("cadreSelect1") != null)
+                        doubleFlight.setCadre("1" + request.getParameter("cadre"));
+                    if (request.getParameter("cadreSelect2") != null)
+                        doubleFlight.setCadre(doubleFlight.getCadre() + " " + "2" + request.getParameter("cadre"));
+                    doubleFlight.setMpRemark(request.getParameter("remarks"));
+                    doubleFlight.setFlightCombine(doubleFlight.getFirstQualification().substring(0, 1) + doubleFlight.getSecondQualification().substring(0, 1));
+                    doubleFlightRepository.save(doubleFlight);
+                    map.put("msg", "修改成功");
+                    return map;
+                }
+            } else {
+                map.put("msg", "待飞行部确认方可修改");
+                return map;
+            }
+        } else
+            map.put("msg", "待财务部确认方可修改");
         return map;
     }
 
@@ -536,9 +637,9 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                 doubleFlight.setDoubleLine(request.getParameter("doubleLine"));
                 doubleFlight.setNightFlight(request.getParameter("nightFlight"));
                 doubleFlight.setStageDoubleFlight(request.getParameter("stageDoubleFlight"));
-                if(request.getParameter("flightCheck").equals(""))
+                if (request.getParameter("flightCheck").equals(""))
                     doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
-                if(request.getParameter("cadre").equals(""))
+                if (request.getParameter("cadre").equals(""))
                     doubleFlight.setCadre(request.getParameter("cadre"));
                 if (doubleFlight.getFlightCheck() != null) {
                     if (request.getParameter("checkSelect1") != null) {
@@ -629,9 +730,9 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                     doubleFlight.setNightFlight(request.getParameter("nightFlight"));
                     doubleFlight.setStageDoubleFlight(request.getParameter("stageDoubleFlight"));
 
-                    if(request.getParameter("flightCheck").equals(""))
+                    if (request.getParameter("flightCheck").equals(""))
                         doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
-                    if(request.getParameter("cadre").equals(""))
+                    if (request.getParameter("cadre").equals(""))
                         doubleFlight.setCadre(request.getParameter("cadre"));
 
                     if (doubleFlight.getFlightCheck() != null) {
@@ -734,9 +835,9 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                 doubleFlight.setDoubleLine(request.getParameter("doubleLine"));
                 doubleFlight.setNightFlight(request.getParameter("nightFlight"));
                 doubleFlight.setStageDoubleFlight(request.getParameter("stageDoubleFlight"));
-                if(request.getParameter("flightCheck").equals(""))
+                if (request.getParameter("flightCheck").equals(""))
                     doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
-                if(request.getParameter("cadre").equals(""))
+                if (request.getParameter("cadre").equals(""))
                     doubleFlight.setCadre(request.getParameter("cadre"));
                 if (doubleFlight.getFlightCheck() != null) {
                     if (request.getParameter("checkSelect1") != null) {
@@ -778,9 +879,9 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
                     doubleFlight.setDoubleLine(request.getParameter("doubleLine"));
                     doubleFlight.setNightFlight(request.getParameter("nightFlight"));
                     doubleFlight.setStageDoubleFlight(request.getParameter("stageDoubleFlight"));
-                    if(request.getParameter("flightCheck").equals(""))
+                    if (request.getParameter("flightCheck").equals(""))
                         doubleFlight.setFlightCheck(request.getParameter("flightCheck"));
-                    if(request.getParameter("cadre").equals(""))
+                    if (request.getParameter("cadre").equals(""))
                         doubleFlight.setCadre(request.getParameter("cadre"));
                     if (doubleFlight.getFlightCheck() != null) {
                         if (request.getParameter("checkSelect1") != null) {
@@ -880,51 +981,54 @@ public class DoubleFlightServiceImpl implements DoubleFlightService {
         cellStyle.setBorderRight(BorderStyle.THIN);
         cellStyle.setBorderTop(BorderStyle.THIN);
         List<DoubleFlight> doubleFlightList = doubleFlightRepository.findAll();
-        try {
-            for (int i = 0; i < doubleFlightList.size(); i++) {
-                if (doubleFlightList.get(i).getIsFlag() == null) {
-                    doubleFlightList.remove(i);
-                    i--;
-                }
-            }
-        } catch (NullPointerException ignored) {
-        } finally {
-            String fileName = "双组航班表" + ".xls";
-            int rowNum = 1;
-            String[] headers = {"序号", "起飞日期", "航班号", "航线名称", "城市三字码", "机组1", "资质1", "机组2", "资质2", "机组组合", "双组航线检查", "过夜航班", "阶段双组", "C检查航线", "飞行管理人员", "飞行部资质修改", "飞行部修改说明", "人力部资质修改", "人力部修改说明"};
-            HSSFRow row = sheet.createRow(0);
+//        try {
+//            for (int i = 0; i < doubleFlightList.size(); i++) {
+//                if (doubleFlightList.get(i).getIsFlag() == null) {
+//                    doubleFlightList.remove(i);
+//                    i--;
+//                }
+//            }
+//        } catch (NullPointerException ignored) {
+//        } finally {
+        String fileName = "双组航班表" + ".xls";
+        int rowNum = 1;
+        String[] headers = {"序号", "起飞日期", "航班号", "航线名称", "城市三字码", "机组1", "资质1", "机组2", "资质2", "机组组合", "双组航线检查", "过夜航班", "阶段双组", "C检查航线", "飞行管理人员", "飞行部资质修改", "飞行部修改说明", "人力部资质修改", "人力部修改说明"};
+        HSSFRow row = sheet.createRow(0);
+        for (int i = 0; i < headers.length; i++) {
+            HSSFCell cell = row.createCell(i);
+            cell.setCellStyle(cellStyle);
+            HSSFRichTextString text = new HSSFRichTextString(headers[i]);
+            cell.setCellValue(text);
+        }
+        //在表中存放查询到的数据放入对应的列
+        for (DoubleFlight doubleFlight : doubleFlightList) {
+            //设置居中
+            HSSFRow row1 = sheet.createRow(rowNum);
+            String[] value = {String.valueOf(rowNum), doubleFlight.getDate(), doubleFlight.getNo(), doubleFlight.getLine(), doubleFlight.getTcc(), doubleFlight.getFirstPosition(), doubleFlight.getFirstQualification(), doubleFlight.getSecondPosition(),
+                    doubleFlight.getSecondQualification(), doubleFlight.getFlightCombine(), doubleFlight.getDoubleLine(), doubleFlight.getNightFlight(), doubleFlight.getStageDoubleFlight(), doubleFlight.getFlightCheck(), doubleFlight.getCadre(), doubleFlight.getAirChangeRecord(),
+                    doubleFlight.getAirRemark(), doubleFlight.getMpChangeRecord(), doubleFlight.getMpRemark()};
             for (int i = 0; i < headers.length; i++) {
-                HSSFCell cell = row.createCell(i);
-                cell.setCellStyle(cellStyle);
-                HSSFRichTextString text = new HSSFRichTextString(headers[i]);
-                cell.setCellValue(text);
+                cellValue(cellStyle, row1, i, value[i]);
             }
-            //在表中存放查询到的数据放入对应的列
-            for (DoubleFlight doubleFlight : doubleFlightList) {
-                //设置居中
-                HSSFRow row1 = sheet.createRow(rowNum);
-                String[] value = {String.valueOf(rowNum), doubleFlight.getDate(), doubleFlight.getNo(), doubleFlight.getLine(), doubleFlight.getTcc(), doubleFlight.getFirstPosition(), doubleFlight.getFirstQualification(), doubleFlight.getSecondPosition(),
-                        doubleFlight.getSecondQualification(), doubleFlight.getFlightCombine(), doubleFlight.getDoubleLine(), doubleFlight.getNightFlight(), doubleFlight.getStageDoubleFlight(), doubleFlight.getFlightCheck(), doubleFlight.getCadre(), doubleFlight.getAirChangeRecord(),
-                        doubleFlight.getAirRemark(), doubleFlight.getMpChangeRecord(), doubleFlight.getMpRemark()};
-                for (int i = 0; i < headers.length; i++) {
-                    cellValue(cellStyle, row1, i, value[i]);
-                }
-                rowNum++;
-            }
-            for (int i = 0; i < headers.length; i++) {
-                sheet.autoSizeColumn(i);
+            rowNum++;
+        }
+        for (int i = 0; i < headers.length; i++) {
+            //sheet.autoSizeColumn(i);
+            if(sheet.getColumnWidth(i)*2<256*256)
                 sheet.setColumnWidth(i, sheet.getColumnWidth(i) * 12 / 10);
-            }
-            response.setContentType("application/octet-stream");
-            response.setHeader("Content-disposition", "attachment;filename=" + java.net.URLEncoder.encode(fileName, "UTF-8"));
-            try {
-                response.flushBuffer();
-                workbook.write(response.getOutputStream());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            else
+                sheet.setColumnWidth(i,6000);
+        }
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-disposition", "attachment;filename=" + java.net.URLEncoder.encode(fileName, "UTF-8"));
+        try {
+            response.flushBuffer();
+            workbook.write(response.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
+//    }
 
     @Override
     public void downloadMoreDoubleFlight(HttpServletResponse response) throws IOException {

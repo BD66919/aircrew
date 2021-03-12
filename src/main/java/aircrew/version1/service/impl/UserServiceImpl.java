@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
         List<User> userList = userRepository.findAll();
         System.out.println(userList);
         model.addAttribute("userList",userList);
-        return "/user/user";
+        return "user/user";
     }
 
     @Override
